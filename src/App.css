@@ -4,10 +4,14 @@
   --color2: #d6e03e;
   --color3 : #ffe000;
 }
+body{
+  background-color: rgb(248, 238, 223) !important;
+}
 
 .App {
-  /* display: flex;
-  flex-direction: row; */
+  display: flex;
+  flex-direction: row;
+ 
 }
 
 .App-logo {
@@ -81,7 +85,7 @@ nav{
   text-align: center;
   line-height: 100px;
   vertical-align: middle;
-  padding: 5px;
+  padding: 10px;
 }
 
 .circle-icon-no-bg {
@@ -94,6 +98,11 @@ nav{
   vertical-align: middle;
   padding: 5px;
 }
+
+ /* .css-1pmk00y-MuiDataGrid-columnHeaders{
+  position: fixed
+} */
+
 
 @keyframes App-logo-spin {
   from {

@@ -21,26 +21,26 @@ export default function NavBar() {
         bg="dark"
         data-bs-theme="dark"
         className="position-fixed"
-        style={{ height: "100vh", width: "80px" }}
+        style={{ height: "100vh", width: "70px" }}
         id="navBar"
       >
         <Nav className="d-flex flex-column h-100">
           <Link to={"/importData"} className="primary p-4">
             <div className="d-flex justify-content-start">
-              <FontAwesomeIcon icon={faUpload} size="2x" />
+              <FontAwesomeIcon icon={faUpload} size="1x" />
               <div className="navText">Upload Files</div>
             </div>
           </Link>
 
           <Link to={"/headersOn"} className="primary  p-4">
             <div className="d-flex justify-content-start">
-              <FontAwesomeIcon icon={faLockOpen} size="2x" />
+              <FontAwesomeIcon icon={faLockOpen} size="1x" />
               <div className="navText">Headers On</div>
             </div>
           </Link>
           <Link to={"/workPackage"} className="primary  p-4">
             <div className="d-flex justify-content-start">
-              <FontAwesomeIcon icon={faLock} size="2x" />
+              <FontAwesomeIcon icon={faLock} size="1x" />
               <div className="navText ">Workpackage</div>
             </div>
           </Link>
@@ -48,7 +48,7 @@ export default function NavBar() {
         <div className="primary" style={{position:'absolute', bottom:'20%', alignItems:"center", width:'80px'}}>
   <div className="d-flex justify-content-center">
 
-    <FontAwesomeIcon icon={faPerson} size="3x" className="circle-icon-background " />
+    <FontAwesomeIcon icon={faPerson} size="2x" className="circle-icon-background " />
   </div>
  
   </div>

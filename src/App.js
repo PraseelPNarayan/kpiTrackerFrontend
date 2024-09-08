@@ -11,7 +11,7 @@ function App() {
       <div style={{zIndex:999}}>
            <NavBar />
       </div>
-      <div  style={{height:'100vh', marginLeft:'40px'}}>
+      <div style={{height:'100vh', marginLeft:'90px'}}>
 <Outlet/>
       </div>
  
