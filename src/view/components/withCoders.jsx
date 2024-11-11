@@ -5,8 +5,6 @@ export default function WithCoders({data}) {
 
 let assignedWP = data.filter(i => i.Coder !=null)
 
-console.log(assignedWP)
-
 const wpLenth =(coder)=>{
     let wpCount = assignedWP.filter( b => b.Coder === coder)
     return wpCount.length

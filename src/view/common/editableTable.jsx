@@ -60,14 +60,14 @@ const [selectedRow, setsetselectedRow] = useState([])
       }}
       onChange={(event) => {
         setCellValue(event.target.value);
-        console.log(event.target.value);
+      
       }}
     />)
     }
     else {
      return(<textarea defaultValue={cellValue} rows="5" cols="33" onChange={(event) => {
       setCellValue(event.target.value);
-      console.log(event.target.value);
+   
     }}>
 
 </textarea>) 

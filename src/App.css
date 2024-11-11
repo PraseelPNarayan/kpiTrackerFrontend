@@ -1,17 +1,58 @@
-:root{
-  --color1 : #7bc143;
-  --color1Light : #a5c28d;
-  --color2: #d6e03e;
-  --color3 : #ffe000;
+@import url("https://fonts.googleapis.com/css2?family=Koh+Santepheap:wght@100;300;400;700;900&family=Slabo+13px&display=swap");
+
+.koh-santepheap-thin {
+  font-family: "Koh Santepheap", serif;
+  font-weight: 100;
+  font-style: normal;
 }
-body{
-  background-color: rgb(248, 238, 223) !important;
+
+.koh-santepheap-light {
+  font-family: "Koh Santepheap", serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.koh-santepheap-regular {
+  font-family: "Koh Santepheap", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.koh-santepheap-bold {
+  font-family: "Koh Santepheap", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.koh-santepheap-black {
+  font-family: "Koh Santepheap", serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.slabo-13px-regular {
+  font-family: "Slabo 13px", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root {
+  --color1: #7bc143;
+  --color1Light: #a5c28d;
+  --color2: #d6e03e;
+  --color3: #ffe000;
+  --dark: rgb(33, 37, 41);
+}
+body {
+  /* background-color: rgb(248, 238, 223) !important; */
+  font-family: "slabo-13px-regular";
+  font-weight: 400;
+  font-style: normal;
 }
 
 .App {
-  display: flex;
-  flex-direction: row;
- 
+  /* display: flex;
+  flex-direction: row; */
 }
 
 .App-logo {
@@ -39,46 +80,108 @@ body{
 .App-link {
   color: #61dafb;
 }
+.loginPage {
+  height: 100vh;
+  display: flex;
 
-.scrollable{
+  background: #777970
+  /* background: linear-gradient(7deg, rgba(123,193,67,1) 0%, rgba(214,224,62,1) 35%, rgba(255,224,0,1) 100%);  */
+}
+
+.loginFormContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 400px !important;
+  padding: 30px;
+  height: 450px;
+}
+
+.loginFormContainer * fieldset {
+  width: 300px;
+  text-align: justify;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white; */
+  width: 700px;
+  /* padding:20px; */
+  box-shadow: black;
+  /* border: 1px solid black; */
+  border-radius: 20px;
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+  /* box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px; */
+  text-align: center;
+  /* height: 450px; */
+  align-content: center;
+}
+
+.loginForm * {
+  width: 300px;
+}
+
+.loginImage {
+  width: 100%;
+  max-width: 2826px;
+  background-image: url(../public/SAC_9737-2048x1367.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.scrollable {
   overflow: scroll;
 }
 
-a{
+a {
   text-decoration: none !important;
 }
 
 .primary > * {
   color: var(--color1);
- &:hover{
-.navText{
-    color: var(--color3);
-  }
-svg {
-    color: var(--color3);
-  }
-  }
 }
 
-.navText{
+#navBar {
+  width: 50px;
+  transition: width 0.4s ease-in-out;
+}
+#navBar:hover {
+  width: 200px;
+ max-width: 200px;
+}
+
+#navBar:hover .navText {
+  display: block;
+  color: var(--color1);
+  font-weight: 500;
+  transition: display 1s ease-out;
+}
+
+.navText {
   display: none;
 }
-nav{
 
-  &:hover{
-      width: 200px !important ;
-  transition: all .5s ease-in-out;
+.expand:hover {
+  background-color: #7bc143;
+  transition: all 0.5s ease-in-out;
+  width: 100%;
+  svg {
+    color: var(--dark);
+  }
   .navText {
     display: block;
-    padding-left: 10px;
-
+    color: var(--dark) !important;
   }
-
-}
 }
 
 .circle-icon-background {
-  background: #393e42 ;
+  background: #393e42;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -89,7 +192,6 @@ nav{
 }
 
 .circle-icon-no-bg {
- 
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -99,9 +201,109 @@ nav{
   padding: 5px;
 }
 
- /* .css-1pmk00y-MuiDataGrid-columnHeaders{
+/* .css-1pmk00y-MuiDataGrid-columnHeaders{
   position: fixed
 } */
+.reportCards {
+  margin-left: 20px;
+  width: 600px;
+  text-align: center;
+}
+
+.reportCardBody {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.expand {
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+  font-weight: 500;
+}
+
+/* .expand:hover {
+
+  background-color: #7bc143;
+  transition: all 0.5s ease-in-out;
+  width: 100%;
+  svg {
+    color: var(--dark);
+ 
+  }
+  .navText {
+    display: block;
+    color: var(--dark);
+  }
+} */
+
+/* .expand:hover + nav{
+  width: 300px;
+} */
+
+.activeLink {
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+  background-color: var(--color2);
+  svg {
+    color: var(--dark);
+  }
+  .navText{
+    color: var(--dark) !important;
+  }
+}
+
+.accountSettingsOptions {
+  display: none;
+  align-self: center;
+  text-align: center;
+}
+.accountSettingsOptions > div {
+  height: 40px;
+}
+.accountSettingsOptions > div * {
+ cursor: pointer;
+
+}
+.accountSettingsOptions > div:hover {
+  background-color: var(--dark);
+  color: var(--color3);
+  /* cursor: pointer; */
+
+}
+.linkHover:hover *{
+  background-color: var(--dark);
+  color: var(--color3);
+  /* cursor: pointer; */
+
+}
+.applyHoverEffectOnAccount:hover {
+  background-color: var(--color1);
+  color: var(--dark);
+  width: 100%;
+    .navText {
+      display: block;
+      color: var(--dark) !important;
+    }
+    a {
+    
+      color: var(--dark) !important;
+    }
+  
+}
+
+.applyHoverEffectOnAccount:hover > .accountSettingsOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--color1);
+  color: var(--dark);
+  padding: 5px;
+  gap: 10px;
+}
+
 
 
 @keyframes App-logo-spin {

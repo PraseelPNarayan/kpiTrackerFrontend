@@ -10,12 +10,12 @@ export default function SpreadSheetImporter({fields,isImportOpen,SetData,CloseIm
 
       let addedData =[]
       data.validData.forEach((element,index) => {
-      let test = {"status": "","id": index,...element}
+      let test = {"status": "","id": 0,...element}
 
       addedData.push(test)
     
       });
-      console.log(addedData)
+    
       SetData(addedData); 
       
       }} fields={fields} />

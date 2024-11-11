@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {Action, ThunkAction, configureStore } from "@reduxjs/toolkit";
 import kpiTrackerSlice from "../reducer/kpiTrackerSlice";
 export const store = configureStore({
     reducer:

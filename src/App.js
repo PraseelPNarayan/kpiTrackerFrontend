@@ -7,13 +7,10 @@ import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
-    <div className="App">
-      <div style={{zIndex:999}}>
-           <NavBar />
-      </div>
-      <div style={{height:'100vh', marginLeft:'90px'}}>
-<Outlet/>
-      </div>
+    <div className="App koh-santepheap-regular">
+     
+     <NavBar />
+    
  
 
     </div>

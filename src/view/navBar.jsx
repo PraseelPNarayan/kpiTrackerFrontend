@@ -1,59 +1,164 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  redirect,
+  redirectDocument,
+  useNavigate,
+} from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFilePen,
+  faGear,
   faLock,
   faLockOpen,
   faPerson,
   faUpload,
+  faGears,
+  faPowerOff,
+  faKey,
 } from "@fortawesome/free-solid-svg-icons";
-import { faPersonCircleCheck } from "@fortawesome/free-solid-svg-icons/faPersonCircleCheck";
-import { faHotTubPerson } from "@fortawesome/free-solid-svg-icons/faHotTubPerson";
-import { faPersonBooth } from "@fortawesome/free-solid-svg-icons/faPersonBooth";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import Apiservice from "../js/api/apiService";
+import { loginStaff, updateStaff } from "../js/reducer/kpiTrackerSlice";
+import { Select } from "@mui/material";
+import { isPending } from "@reduxjs/toolkit";
+import AuthProvider, { useAuth } from "../js/auth/authProvider";
+
 export default function NavBar() {
+  const user = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  console.log(user.userParsed.role)
+
+  const determineClass = ({ isActive, isPending }) => {
+    return isActive ? "activeLink p-3" : "primary p-3 expand";
+  };
+
   return (
     <React.Fragment>
-      <Navbar
-        bg="dark"
-        data-bs-theme="dark"
-        className="position-fixed"
-        style={{ height: "100vh", width: "70px" }}
-        id="navBar"
-      >
-        <Nav className="d-flex flex-column h-100">
-          <Link to={"/importData"} className="primary p-4">
-            <div className="d-flex justify-content-start">
-              <FontAwesomeIcon icon={faUpload} size="1x" />
-              <div className="navText">Upload Files</div>
-            </div>
-          </Link>
+      <div className="d-flex justify-content-start">
+        <div>
+          <Navbar
+            bg="dark"
+            data-bs-theme="dark"
+            className="position-fixed"
+            style={{ zIndex: 999, padding: 0, height: "100vh" }}
+            id="navBar"
+          >
+            <Nav className="d-flex flex-column h-100 w-100">
+              <NavLink to={"/home/importData"} className={determineClass}>
+                <div>
+                  <FontAwesomeIcon icon={faUpload} size="1x" />
+                </div>
+                <div>
+                  <label className="navText">Upload</label>
+                </div>
+              </NavLink>
 
-          <Link to={"/headersOn"} className="primary  p-4">
-            <div className="d-flex justify-content-start">
-              <FontAwesomeIcon icon={faLockOpen} size="1x" />
-              <div className="navText">Headers On</div>
-            </div>
-          </Link>
-          <Link to={"/workPackage"} className="primary  p-4">
-            <div className="d-flex justify-content-start">
-              <FontAwesomeIcon icon={faLock} size="1x" />
-              <div className="navText ">Workpackage</div>
-            </div>
-          </Link>
+              <NavLink
+                to={"/home/headersOn"}
+                className={determineClass}
+                onClick={() => {
+                  dispatch(Apiservice.getAllHeadersOn());
+                }}
+              >
+                <div className="">
+                  <FontAwesomeIcon icon={faLockOpen} size="1x" />
+                </div>
+                <div>
+                  <label className="navText">Headers</label>
+                </div>
+              </NavLink>
+              <NavLink to={"/home/workPackage"} className={determineClass}>
+                <div className="">
+                  <FontAwesomeIcon icon={faLock} size="1x" />
+                </div>
+                <div>
+                  <label className="navText">Workpackage</label>
+                </div>
+              </NavLink>
+              <NavLink
+                to={"/home/settings"}
+                className={determineClass}
+                onClick={() => {
+                  dispatch(Apiservice.getAllCoders());
+                  dispatch(Apiservice.getAllUsers());
+                }}
+                // hidden= {user.userParsed.role === 'Admin' ? true : false}
+              >
+                <div className="">
+                  <FontAwesomeIcon icon={faGears} size="1x" />
+                </div>
+                <div>
+                  <label className="navText">Settings</label>
+                </div>
+              </NavLink>
 
-        <div className="primary" style={{position:'absolute', bottom:'20%', alignItems:"center", width:'80px'}}>
-  <div className="d-flex justify-content-center">
+              <div
+                className="primary"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "start",
+                }}
+              >
+                <div className="applyHoverEffectOnAccount">
+                  <FontAwesomeIcon icon={faPerson} size="2x" className="p-3" />
+                  <label
+                    className="navText"
+                    style={{ paddingLeft: "15px", textWrap: "wrap" }}
+                  >
+                    {user.userParsed.userName}
+                  </label>
+                  <div className="accountSettingsOptions">
+                    <div
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        dispatch(loginStaff({}));
+                        localStorage.clear();
+                        navigate("/login", true);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faPowerOff} title="Logout" />
 
-    <FontAwesomeIcon icon={faPerson} size="2x" className="circle-icon-background " />
-  </div>
- 
-  </div>
-        </Nav>
-      </Navbar>
+                      <label className="p-2">Logout</label>
+                    </div>
+                    <div className="linkHover">
+                      <FontAwesomeIcon icon={faKey} title="Logout" />
+                      <Link style={{paddingLeft: "10px"}}
+                        to={`/home/settings/addEditUser`}
+                        onClick={() => {
+                          dispatch(
+                            updateStaff({
+                              email: user.userParsed.email,
+                              userName: user.userParsed.userName,
+                              isActive: true,
+                              role: user.userParsed.role,
+                              id: user.userParsed.id,
+                            })
+                          );
+                        }}
+                      >
+                        <label>Change Details</label>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Nav>
+          </Navbar>
+        </div>
+        <div style={{ marginLeft: "100px" }}>
+          <Outlet />
+        </div>
+      </div>
     </React.Fragment>
   );
 }
