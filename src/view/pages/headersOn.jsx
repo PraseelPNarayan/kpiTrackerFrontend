@@ -24,6 +24,7 @@ import ApiService from "../../js/api/apiService";
 import Success from "../common/success";
 import Errors from "../common/errors";
 import moment from "moment";
+import { Spinner } from "../common/spinner";
 
 export default function HeadersOn() {
   const data = useSelector((state) => state.kpiTracker.headersOn);
@@ -40,6 +41,7 @@ export default function HeadersOn() {
   );
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
+  const toggleSpinner = useSelector((state) => state.kpiTracker.toggleSpinner);
 
   const [show, setShow] = useState(false);
   const [coder, setCoder] = useState();
@@ -162,6 +164,7 @@ export default function HeadersOn() {
 
   return (
     <>
+      <Spinner loadSpinner={toggleSpinner} />
        <Errors message={errorMessage} show={error} />
     
       <Success

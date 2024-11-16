@@ -111,6 +111,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.postCreateHeadersOn.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.postCreateHeadersOn.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -129,6 +131,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.getAllHeadersOn.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.getAllHeadersOn.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -143,6 +147,8 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putHeadersOn.pending, (state) => {
         state.status = "pending";
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.putHeadersOn.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -157,6 +163,8 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putHeadersOnBatch.pending, (state) => {
         state.success = "pending";
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.putHeadersOnBatch.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -177,6 +185,8 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putHeadersOnBatchEntries.pending, (state) => {
         state.success = "pending";
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.putHeadersOnBatchEntries.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -198,6 +208,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.getAllCoders.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.getAllCoders.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -214,6 +226,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.getAllWorkpackages.pending, (state,action) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.getAllWorkpackages.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -229,6 +243,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.postCreateWorkpackages.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.postCreateWorkpackages.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -247,6 +263,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.createCoder.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.createCoder.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -262,6 +280,8 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.updateCoder.pending, (state) => {
         state.status = "pending";
+        state.error = false;
+        state.errorMessage = null;
 
         state.toggleSpinner = true;
       })
@@ -283,6 +303,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.getAllUsers.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.getAllUsers.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -299,6 +321,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.updateUser.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.updateUser.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -318,6 +342,8 @@ export const kpiTrackerSlice = createSlice({
       .addCase(Api.createUser.pending, (state) => {
         state.status = "pending";
         state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
       })
       .addCase(Api.createUser.fulfilled, (state, action) => {
         state.status = "succeeded";

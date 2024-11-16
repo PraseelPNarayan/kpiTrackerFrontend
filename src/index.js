@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
+import "../src/App.css";
 import reportWebVitals from "./reportWebVitals";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+
 import NotFound from "./view/pages/notFound";
 import SpreadSheetImporter from "./view/common/spreadSheetImporter";
 import HeadersOn from "./view/pages/headersOn";
@@ -18,56 +19,21 @@ import NavBar from "./view/navBar";
 import UsersForm from "./view/common/forms/usersForm";
 import Login from "../src/view/pages/login";
 import ProtectedRoutes from "./view/pages/protectedRoutes";
-import Routes from "./view/pages/routes";
+// import Routes from "./view/pages/routes";
 import AuthProvider from "./js/auth/authProvider";
-
-
-
-
-// const router = createBrowserRouter([
-//   {
-//     path: "/home",
-//     element: <ProtectedRoutes> <NavBar /> </ProtectedRoutes>,
-//      errorElement: <NotFound />,
-//     children: [
-//            { index : true,
-//         path: "/home/importData",
-//         element: <ImportData />,
-//       },
-//       {
-//         path: "/home/headersOn",
-//         element: <HeadersOn />,
-//       },
-//       {
-//         path: "/home/workPackage",
-//         element: <Workpackage />,
-//       },
-//       {
-//         path: "/home/settings",
-//         element: <Settings />,
-//       },
-//       { path: "/home/settings/addEditCoder", element: <CodersForm /> },
-//       { path: "/home/settings/addEditUser", element: <UsersForm /> },
-//     ],
-//   },
-//   { path: "/login", element: <Login /> },
-//   { path: "*", element: <NotFound /> },
-// ]);
+import Routes from "./view/pages/routes";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
 
   <Provider store={store}>
-
-    {/* <RouterProvider router={router} /> */}
     <AuthProvider>
-
-    <Routes/>
+    {/* <RouterProvider router={router} /> */}
+   {Routes()}
     </AuthProvider>
-
   </Provider>
- 
+
   // </React.StrictMode>
 );
 

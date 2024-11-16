@@ -29,13 +29,14 @@ import { loginStaff, updateStaff } from "../js/reducer/kpiTrackerSlice";
 import { Select } from "@mui/material";
 import { isPending } from "@reduxjs/toolkit";
 import AuthProvider, { useAuth } from "../js/auth/authProvider";
+import Roles from "../js/auth/roles";
 
 export default function NavBar() {
   const user = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log(user.userParsed.role)
+  console.log( Roles.ImportDataRole.includes(user.userParsed.role))
 
   const determineClass = ({ isActive, isPending }) => {
     return isActive ? "activeLink p-3" : "primary p-3 expand";
@@ -53,7 +54,9 @@ export default function NavBar() {
             id="navBar"
           >
             <Nav className="d-flex flex-column h-100 w-100">
-              <NavLink to={"/home/importData"} className={determineClass}>
+              <NavLink to={"/home/importData"} className={determineClass}
+                hidden= {Roles.ImportDataRole.includes(user.userParsed.role)  ? false : true}
+              >
                 <div>
                   <FontAwesomeIcon icon={faUpload} size="1x" />
                 </div>
@@ -68,6 +71,7 @@ export default function NavBar() {
                 onClick={() => {
                   dispatch(Apiservice.getAllHeadersOn());
                 }}
+                hidden= {Roles.HeadersOnRole.includes(user.userParsed.role)  ? false : true}
               >
                 <div className="">
                   <FontAwesomeIcon icon={faLockOpen} size="1x" />
@@ -76,7 +80,7 @@ export default function NavBar() {
                   <label className="navText">Headers</label>
                 </div>
               </NavLink>
-              <NavLink to={"/home/workPackage"} className={determineClass}>
+              <NavLink to={"/home/workPackage"} className={determineClass}   hidden= {Roles.WorkPackageRole.includes(user.userParsed.role)  ? false : true}>
                 <div className="">
                   <FontAwesomeIcon icon={faLock} size="1x" />
                 </div>
@@ -85,13 +89,14 @@ export default function NavBar() {
                 </div>
               </NavLink>
               <NavLink
+             hidden= {Roles.SettingsRole.includes(user.userParsed.role)  ? false : true}
                 to={"/home/settings"}
                 className={determineClass}
                 onClick={() => {
                   dispatch(Apiservice.getAllCoders());
                   dispatch(Apiservice.getAllUsers());
                 }}
-                // hidden= {user.userParsed.role === 'Admin' ? true : false}
+                
               >
                 <div className="">
                   <FontAwesomeIcon icon={faGears} size="1x" />

@@ -187,9 +187,9 @@ export default function WorkPackage() {
             backgroundColor: "white",
             color: "black",
             // width: "500px",
-            height: "160px",
+            minHeightheight: "160px",
             alignContent: "center",
-            padding: "20px",
+            padding:'20px 20px 0px 20px',
             borderRadius: "20px",
             boxShadow: "10px 10px 15px grey",
           }}

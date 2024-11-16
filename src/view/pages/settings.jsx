@@ -101,7 +101,7 @@ export default function Settings({match}) {
                               }}>
                           <FontAwesomeIcon
                             icon={faUserPen}
-                            size={100}
+                            size={"2x"}
                             color="green"
                         
                           />
