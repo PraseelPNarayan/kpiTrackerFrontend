@@ -1,5 +1,6 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import ImportData from './importData';
 import NavBar from '../navBar';
@@ -11,30 +12,32 @@ import UsersForm from '../common/forms/usersForm';
 import NotFound from './notFound';
 import Login from './login';
 import ProtectedRoutes from './protectedRoutes';
+import { useAuth } from '../../js/auth/authProvider';
+import Unauthorized from './unAuthorised';
+import Roles from '../../js/auth/roles';
 
 const Routes =()=>{
-
     const routes = createBrowserRouter([
         {
           path: "/home",
-          element: <ProtectedRoutes> <NavBar /> </ProtectedRoutes>,
+          element: <ProtectedRoutes element={ <NavBar />}  roles={Roles.AccessAll} /> ,
            errorElement: <NotFound />,
           children: [
                  { index : true,
               path: "/home/importData",
-              element: <ImportData />,
+              element:<ProtectedRoutes element={<ImportData />} roles={Roles.ImportDataRole} /> ,
             },
             {
               path: "/home/headersOn",
-              element: <HeadersOn />,
+              element: <ProtectedRoutes element={<HeadersOn />} roles={Roles.ImportDataRole} />,
             },
             {
               path: "/home/workPackage",
-              element: <WorkPackage />,
+              element: <ProtectedRoutes element={<WorkPackage />} roles={Roles.WorkPackageRole} />,
             },
             {
               path: "/home/settings",
-              element: <Settings />,
+              element:<ProtectedRoutes element={<Settings />} roles={Roles.SettingsRole} />,
             },
             { path: "/home/settings/addEditCoder", element: <CodersForm /> },
             { path: "/home/settings/addEditUser", element: <UsersForm /> },

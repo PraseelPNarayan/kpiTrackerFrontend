@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, useLocation,Route } from 'react-router-dom'
 import {jwtDecode} from 'jwt-decode'
 import moment from 'moment'
 import { loginStaff } from '../../js/reducer/kpiTrackerSlice'
+import { useAuth } from '../../js/auth/authProvider'
+import { trim } from 'validator'
 
-
-
-
-
-export default function ProtectedRoutes({children}) {
-const isLoggedIn = useSelector(state => state.kpiTracker.loggedInStaff)
+ const ProtectedRoutes =({element,roles}) => {
+const userProfile = useSelector(state => state.kpiTracker.loggedInStaff)
 const location = useLocation();
 
 const dispatch= useDispatch()
@@ -25,16 +23,26 @@ dispatch(loginStaff({}))
 }
 
 useEffect(()=>{
-  logOutUser()
+  if(tokenExpired)
+  {
+
+    logOutUser()
+  }
 },[tokenExpired])
 
-
-  return token && !tokenExpired && isLoggedIn ? 
+// const userHasRequiredRole = user && roles.includes(user.userParsed.role) ? true : false;
+  return token && !tokenExpired && userProfile.isLoggedIn && roles.includes(userProfile.role)? 
   
-  children
+  element
   
   : <Navigate to="/login" replace state={{from:location}}/> 
 
+//   if (user.userParsed.isLoggedIn && !userHasRequiredRole) {
+//     return (<h1> You are not authorised</h1>); // build your won access denied page (sth like 404)
+//   }
+// return children
   // return  children
   
 }
+
+export default ProtectedRoutes

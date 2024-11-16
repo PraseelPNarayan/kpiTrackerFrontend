@@ -95,7 +95,7 @@ const Login = () => {
             };
             setToken(JSON.stringify(loginStaffPayload));
             dispatch(loginStaff(loginStaffPayload));
-            navigate("/home/importdata", { replace: true });
+            // navigate("/home/importdata", { replace: true });
          
           }
         })
@@ -178,6 +178,7 @@ const Login = () => {
               color="primary"
               type="submit"
               disabled = {disableButton ? true : false}
+              // onClick={(event) => {event.preventDefault();}}
               // style={{ width: "500px" }}
             >
                {disableButton ? 'Please wait.....' : 'Login'}
