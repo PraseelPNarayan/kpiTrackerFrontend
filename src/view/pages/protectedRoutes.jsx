@@ -15,8 +15,14 @@ const dispatch= useDispatch()
 
 
 let token =JSON.parse(localStorage.getItem('token'))
-const decoded = jwtDecode(token.token)
-const tokenExpired = moment.unix(decoded.exp).format('DD/MM/YYYY hh:mm:ss') < moment().format('DD/MM/YYYY hh:mm:ss')
+let decoded =token && token.token ?  jwtDecode(token.token) : null
+let tokenExpired = null
+if(decoded)
+{
+  tokenExpired = moment.unix(decoded.exp).format('DD/MM/YYYY hh:mm:ss') < moment().format('DD/MM/YYYY hh:mm:ss')
+
+}
+
 
 const logOutUser=()=>{
 dispatch(loginStaff({}))
@@ -30,8 +36,11 @@ useEffect(()=>{
   }
 },[tokenExpired])
 
+console.log(
+  token, !tokenExpired,token.isLoggedIn,roles.includes(token.role)
+)
 // const userHasRequiredRole = user && roles.includes(user.userParsed.role) ? true : false;
-  return token && !tokenExpired && userProfile.isLoggedIn && roles.includes(userProfile.role)? 
+  return token && !tokenExpired && token.isLoggedIn && roles.includes(token.role)? 
   
   element
   

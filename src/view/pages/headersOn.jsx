@@ -156,6 +156,13 @@ export default function HeadersOn() {
           };
           schema = { ...schema, ...dateParams };
         }
+        if (columnHeader.type && columnHeader.type === "dateTime") {
+          let dateParams = {
+            valueGetter: (value, row) =>
+              row[i] ? new Date(row[i]) : null,
+          };
+          schema = { ...schema, ...dateParams };
+        }
         tempCol.push(schema);
       });
     setColumnHeaders(tempCol);

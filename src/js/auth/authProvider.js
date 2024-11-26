@@ -7,9 +7,7 @@ const AuthProvider = ({ children }) => {
   // State to hold the authentication token
   const [user, setToken_] = useState(localStorage.getItem("token"));
 
-let userParsed = JSON.parse(user)
-
-
+  let userParsed = JSON.parse(user);
 
   // Function to set the authentication token
   const setToken = (newToken) => {
@@ -17,14 +15,13 @@ let userParsed = JSON.parse(user)
   };
 
   useEffect(() => {
- 
     if (user) {
-      let token = userParsed.token
+      let token = userParsed.token;
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-      localStorage.setItem('token',user);
+      localStorage.setItem("token", user);
     } else {
       delete axios.defaults.headers.common["Authorization"];
-      localStorage.removeItem('token')
+      localStorage.removeItem("token");
     }
   }, [user]);
 

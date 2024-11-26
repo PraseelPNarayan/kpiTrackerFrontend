@@ -357,7 +357,29 @@ export const kpiTrackerSlice = createSlice({
         state.toggleSpinner = false;
         state.error = true;
       })
-      ;
+
+      .addCase(Api.putWorkpackagesBatch.pending, (state) => {
+        state.success = "pending";
+        state.error = false;
+        state.errorMessage = null;
+      })
+      .addCase(Api.putWorkpackagesBatch.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // action.payload.forEach(headersOn => {
+        //   let index = state.headersOn.findIndex(x => x.id === headersOn.id)
+
+        //   state.headersOn[index] = headersOn;
+
+        // })
+        // state.missingWorkPackages = action.payload;
+        state.success = true;
+      })
+      .addCase(Api.putWorkpackagesBatch.rejected, (state, action) => {
+        state.status = "failed";
+        state.errorMessage = action.error.message;
+        state.success = false;
+        state.error = true;
+      })
   },
 });
 

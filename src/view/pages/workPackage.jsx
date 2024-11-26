@@ -3,10 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
   Button,
-  Container,
-  Row,
-  Col,
-  FormControl,
+Form,
   CardHeader,
   CardBody,
   CardTitle,
@@ -16,21 +13,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCross,
   faMagnifyingGlass,
-  faRedoAlt,
-  faTimesCircle,
+ faPenToSquare
 } from "@fortawesome/free-solid-svg-icons";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { Skeleton, Box } from "@mui/material";
+import Modal from "react-bootstrap/Modal";
 
 import Table from "../common/table";
 import ApiService from "../../js/api/apiService";
 import moment from "moment";
 import { FormHelperText, InputLabel } from "@mui/material";
+
+import Success from "../common/success";
 import Errors from "../common/errors";
 import { Spinner } from "../common/spinner";
-import { workPackage } from "../../js/reducer/kpiTrackerSlice";
+import { workPackage,updatePutSuccessFlag } from "../../js/reducer/kpiTrackerSlice";
 
 export default function WorkPackage() {
   const data = useSelector(workPackage);
@@ -47,8 +46,24 @@ export default function WorkPackage() {
   const [showError, setShowError] = useState(error);
   const [showErrorMessage, setShowErrorMessage] = useState(errorMessage)
   const [pagedData, setPagedData] = useState();
+  const [rowIds, setRowIds] = useState([]);
+  const [show, setShow] = useState(false);
 
   const dispatch = useDispatch();
+
+  const putWorkPackageSuccess = useSelector(
+    (state) => state.kpiTracker.success
+  );
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  let completeionStatusValue = null;
+  let completeionCharacterizationValue = null;
+  let characterizationValue = null;
+
+  const completeionStatus = ApiService.workPackageFields.filter(v => v.label === 'Completion Status')
+  const completeionCharacterization = ApiService.workPackageFields.filter(v => v.label === 'Completion Characterization')
+  const characterization = ApiService.workPackageFields.filter(v => v.label === 'Characterization')
 
   useEffect(() => {
     loadTableHeaders();
@@ -59,7 +74,11 @@ export default function WorkPackage() {
   }, [data]);
 
   const updateRowInStore = (data) => {
-    // dispatch(updateWorkPackageRow(data))
+    let payload = []
+    payload.push(data)
+    // console.log(payload)
+     dispatch(ApiService.putWorkpackagesBatch
+      (payload))
   };
 
   const loadAllWorkPackages = () => {
@@ -93,7 +112,7 @@ export default function WorkPackage() {
         let schema = {
           field: columnHeader.key,
           headerName: columnHeader.label,
-          editable: columnHeader.key === "id" ? false : true,
+          editable: columnHeader.editable ?? true,
           // headerClassName: "super-app-theme--header",
           type: columnHeader.type ? columnHeader.type : "text",
           valueOptions: columnHeader.valueOptions
@@ -143,6 +162,7 @@ export default function WorkPackage() {
         .filter((x) => x.coder != null)
         .reduce((a, v) => a + v.giS_Length, initialValue);
     }
+       
     return (
       <>
         <div>
@@ -170,8 +190,105 @@ export default function WorkPackage() {
       </>
     );
   };
+
+  const updateSetStatus = () => {
+    let workpackagesToUpdate = [];
+
+    rowIds.forEach((y) => {
+      let copyWorkpackages = [...data];
+      let foundWorkpackages = copyWorkpackages.findIndex((x) => x.id === y);
+
+      workpackagesToUpdate.push({
+        ...copyWorkpackages[foundWorkpackages],
+        completion_Status : completeionStatusValue,
+        completion_Characterization : completeionCharacterizationValue,
+        characterization : characterizationValue
+      });
+    });
+
+ 
+    dispatch(ApiService.putWorkpackagesBatch(workpackagesToUpdate));
+    handleClose();
+    // setData(storeData)
+  };
   return (
     <div className="container-fluid p-4">
+   <Spinner loadSpinner={toggleSpinner} />
+       <Errors message={errorMessage} show={error} />
+    
+      <Success
+        message={"Workpackage Updates"}
+        show={putWorkPackageSuccess}
+        UpdateSuccessFlag={() => dispatch(updatePutSuccessFlag())}
+      />
+
+<Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update Attributes of Selected WP</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* <InputGroup className="mb-3" onChange={(event) => setCoder(event.target.value)}> */}
+        <Form.Label>Completion Status</Form.Label>
+          <Form.Select
+            aria-label="Default select example"
+            onChange={(event) => {
+             completeionStatusValue = event.target.value;
+          
+            }}
+          >
+            <option></option>
+            {completeionStatus[0].valueOptions.map((values) => (
+              
+              <option key={values}>{values}</option>
+            ))}
+          </Form.Select>
+       
+          <Form.Label>Completion Characterization</Form.Label>
+          <Form.Select
+            aria-label="Default select example"
+            onChange={(event) => {
+              completeionCharacterizationValue = event.target.value;
+           
+             }}
+          >
+            <option></option>
+            
+            {completeionCharacterization[0].valueOptions.map((value) => (
+              
+              <option key={value}>{value}</option>
+            ))}
+          </Form.Select>
+          <Form.Label>Characterization</Form.Label>
+          <Form.Select
+            aria-label="Default select example"
+            onChange={(event) => {
+              characterizationValue = event.target.value;
+           
+             }}
+          >
+            <option></option>
+            {characterization[0].valueOptions.map((value) => (
+              
+              <option key={value}>{value}</option>
+            ))}
+          </Form.Select>
+
+        
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => updateSetStatus()}
+          >
+         Update
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
       <Spinner loadSpinner={toggleSpinner} />
       <Errors
         showHeading={false}
@@ -236,13 +353,27 @@ export default function WorkPackage() {
         </div>
       </div>
       <div style={{ position: "sticky", top: "600px" }}>
+        <div>
+        <Button
+            data-tooltip-id="my-tooltip"
+            variant="success"
+            className="m-2"
+            data-tooltip-content="Received from Coder"
+            onClick={() => setShow(true)}
+          >
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              // onClick={() => updateReceivedFromCoder("Received from Coder")}
+            />
+          </Button>
+        </div>
         {data.length > 0 ? (
           <Table
             tableData={data}
             HandleRowUpdate={(value) => updateRowInStore(value)}
-            HandleStatusChange={() => {}}
+            HandleStatusChange={(data) => setRowIds(data)}
             colHeaders={columnHeaders}
-            editTable={false}
+            // editTable={false}
             HandlePageFilters={(data) => {
               setPagedData(data);
             }}
