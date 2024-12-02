@@ -30,6 +30,7 @@ import Success from "../common/success";
 import Errors from "../common/errors";
 import { Spinner } from "../common/spinner";
 import { workPackage,updatePutSuccessFlag } from "../../js/reducer/kpiTrackerSlice";
+import Cards from "../components/cards";
 
 export default function WorkPackage() {
   const data = useSelector(workPackage);
@@ -131,8 +132,8 @@ export default function WorkPackage() {
       });
     setColumnHeaders(tempCol);
   };
-  const reports = () => {
-    const initialValue = 0;
+
+  const initialValue = 0;
 
     let filteredData = [];
     if (pagedData) {
@@ -163,33 +164,69 @@ export default function WorkPackage() {
         .reduce((a, v) => a + v.giS_Length, initialValue);
     }
        
-    return (
-      <>
-        <div>
-          <h5>
-            <span className="badge bg-secondary m-1">
-              GIS Meters:{" "}
-              {Math.round((totalGisLength + Number.EPSILON) * 100) / 100}
-            </span>
-          </h5>
-          </div>
-          <div>
-          <h5>
-            <span className="badge bg-secondary m-1">
-              Submitted in Moata : {submittedInMoata}
-            </span>
-          </h5>
-          </div>
-          <div>
-          <h5>
-            <span className="badge bg-secondary m-1">
-              With Coder : {withCoder}
-            </span>
-          </h5>
-        </div>
-      </>
-    );
-  };
+
+  // const reports = () => {
+  //   const initialValue = 0;
+
+  //   let filteredData = [];
+  //   if (pagedData) {
+  //     pagedData.map((v) => {
+  //       let index = data.find((x) => x.id === v);
+
+
+  //       filteredData.push(index);
+  //     });
+  //   } else {
+  //     filteredData.push(data);
+  //   }
+  //   let totalGisLength = 0
+  //   let submittedInMoata = 0
+  //   let withCoder = 0
+  //   if(filteredData)
+  //   {
+
+  //      totalGisLength = filteredData.reduce(
+  //       (a, v) => a + v.giS_Length,
+  //       initialValue
+  //     );
+  //      submittedInMoata = data
+  //       .filter((x) => x.status === "To Upload")
+  //       .reduce((a, v) => a + v.giS_Length, initialValue);
+  //      withCoder = data
+  //       .filter((x) => x.coder != null)
+  //       .reduce((a, v) => a + v.giS_Length, initialValue);
+  //   }
+       
+  //   return (
+   
+  //       <div>
+  //         <Card title="GIS Meters" subtitle= {Math.round((totalGisLength + Number.EPSILON) * 100) / 100} />
+  //         <Card title="Submitted in Moata" subtitle= {submittedInMoata} />
+  //         <Card title="With Coder" subtitle= {withCoder} />
+  //         {/* <h5>
+  //           <span className="badge bg-secondary m-1">
+  //             GIS Meters:{" "}
+  //             {Math.round((totalGisLength + Number.EPSILON) * 100) / 100}
+  //           </span>
+  //         </h5>
+  //         </div>
+  //         <div>
+  //         <h5>
+  //           <span className="badge bg-secondary m-1">
+  //             Submitted in Moata : {submittedInMoata}
+  //           </span>
+  //         </h5>
+  //         </div>
+  //         <div>
+  //         <h5>
+  //           <span className="badge bg-secondary m-1">
+  //             With Coder : {withCoder}
+  //           </span>
+  //         </h5> */}
+  //       </div>
+    
+  //   );
+  // };
 
   const updateSetStatus = () => {
     let workpackagesToUpdate = [];
@@ -295,7 +332,10 @@ export default function WorkPackage() {
         show={showError}
         message={showErrorMessage}
       />
-      <div style={{ zIndex: 998, width: "1200px" }}>
+      <div className="d-flex flex-row">
+
+      
+      <div style={{ zIndex: 998, width: "700px" }}>
         <div
           className="mb-4 d-flex"
           style={{
@@ -346,12 +386,19 @@ export default function WorkPackage() {
           </Button>
           <Tooltip id="my-tooltip" style={{ zIndex: 999 }} />
 
-          <Card className="reportCards">
-            <CardHeader>Quick Summary</CardHeader>
-            <CardBody className="reportCardBody">{reports()}</CardBody>
-          </Card>
+         
         </div>
       </div>
+      <div className="d-flex flex-row">
+      <Cards title="GIS Meters" subtitle= {Math.round((totalGisLength + Number.EPSILON) * 100) / 100}  />
+          <Cards title="In Moata" subtitle= {submittedInMoata} />
+          <Cards title="With Coder" subtitle= {withCoder} />
+        {/* <Card className="reportCards">
+            <CardHeader>Quick Summary</CardHeader>
+            <CardBody className="reportCardBody">{reports()}</CardBody>
+          </Card> */}
+      </div>
+          </div>
       <div style={{ position: "sticky", top: "600px" }}>
         <div>
         <Button

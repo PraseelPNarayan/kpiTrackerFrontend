@@ -8,7 +8,7 @@ import axios from "axios";
 
 import ApiService, { baseUrl } from "../../js/api/apiService";
 import Errors from "../common/errors";
-import { loginStaff } from "../../js/reducer/kpiTrackerSlice";
+import { loginStaff,resetErrorFlag } from "../../js/reducer/kpiTrackerSlice";
 import { useNavigate, Routes, Route, redirect } from "react-router-dom";
 import { useAuth } from "../../js/auth/authProvider";
 
@@ -64,6 +64,7 @@ const Login = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      dispatch(resetErrorFlag);
       setLoginButtonDisabled(true);
       let payload = {
         email: values.email,

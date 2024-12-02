@@ -104,6 +104,10 @@ export const kpiTrackerSlice = createSlice({
     },
     loginStaff: (state,action) =>{
       state.loggedInStaff = action.payload
+    },
+    resetErrorFlag:(state,action)=>{
+      state.error = false;
+      state.errorMessage = null;
     }
   },
   extraReducers: (builder) => {
@@ -158,7 +162,8 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putHeadersOn.rejected, (state, action) => {
         state.status = "failed";
-        state.putErrorMessage = action.error.message;
+        state.error =action.error.message;
+        state.errorMessage = action.error.message;
         state.putSuccess = false;
       })
       .addCase(Api.putHeadersOnBatch.pending, (state) => {
@@ -296,7 +301,7 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.updateCoder.rejected, (state, action) => {
         state.status = "failed";
-        state.putErrorMessage = action.error.message;
+        state.errorMessage = action.error.message;
         state.success = false;
         state.error = true;
       })
@@ -334,7 +339,7 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.updateUser.rejected, (state, action) => {
         state.status = "failed";
-        state.putErrorMessage = action.error.message;
+        state.errorMessage = action.error.message;
         state.success = false;
         state.error = true;
         state.toggleSpinner = false;
@@ -396,7 +401,8 @@ export const {
   updateMissingWP,
   updateCoder,
   updateStaff,
-  loginStaff
+  loginStaff,
+  resetErrorFlag
 } = kpiTrackerSlice.actions;
 
 export default kpiTrackerSlice.reducer;

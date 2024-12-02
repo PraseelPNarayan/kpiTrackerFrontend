@@ -19,8 +19,8 @@ let decoded =token && token.token ?  jwtDecode(token.token) : null
 let tokenExpired = null
 if(decoded)
 {
-  tokenExpired = moment.unix(decoded.exp).format('DD/MM/YYYY hh:mm:ss') < moment().format('DD/MM/YYYY hh:mm:ss')
-
+  // tokenExpired = moment.unix(decoded.exp).format('DD/MM/YYYY hh:mm:ss') < moment().format('DD/MM/YYYY hh:mm:ss')
+tokenExpired = moment.unix(decoded.exp) < moment()
 }
 
 
@@ -37,7 +37,7 @@ useEffect(()=>{
 },[tokenExpired])
 
 console.log(
-  token, !tokenExpired,token.isLoggedIn,roles.includes(token.role)
+ tokenExpired
 )
 // const userHasRequiredRole = user && roles.includes(user.userParsed.role) ? true : false;
   return token && !tokenExpired && token.isLoggedIn && roles.includes(token.role)? 
