@@ -121,6 +121,21 @@ const postCreateHeadersOn=createAsyncThunk(Types.createHeadersOn, async (payload
  })
 
 
+ const createOffice=createAsyncThunk(Types.createOffice, async (payload)=>{
+  const response = await axios.post(baseUrl+'/office/createoffice',payload)
+ return response.data
+ })
+
+ const updateOffice=createAsyncThunk(Types.updateOffice, async (payload)=>{
+  const response = await axios.put(baseUrl+'/office/updateOffice',payload)
+ return response.data
+ })
+
+ const getAllOffices=createAsyncThunk(Types.getAllOffices, async ()=>{
+  const response = await axios.get(baseUrl+'/office/getOfficelist')
+ return response.data
+})
+
 
 
 const initialWorkPackageFields = [
@@ -1359,6 +1374,9 @@ export default {
   updateCoder,
   getAllUsers,
   updateUser,
-  createUser
+  createUser,
+  createOffice,
+  updateOffice,
+  getAllOffices
 
 };

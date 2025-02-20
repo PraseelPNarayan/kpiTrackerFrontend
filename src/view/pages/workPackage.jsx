@@ -38,6 +38,7 @@ export default function WorkPackage() {
   const toggleSpinner = useSelector((state) => state.kpiTracker.toggleSpinner);
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
+  const offices = useSelector((state) => state.kpiTracker.officeList)
 
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [apiStatusChanged, setApiStatusChanged] = useState(status);
@@ -49,6 +50,7 @@ export default function WorkPackage() {
   const [pagedData, setPagedData] = useState();
   const [rowIds, setRowIds] = useState([]);
   const [show, setShow] = useState(false);
+  const [selectOffice, setSelectedOffice] = useState();
 
   const dispatch = useDispatch();
 
@@ -333,9 +335,25 @@ export default function WorkPackage() {
         message={showErrorMessage}
       />
       <div className="d-flex flex-row">
-
+        
+      <div className="m-2">
+        <Form.Select style={{width:'200px', display:'inline'}}
+            aria-label="Default select example"
+            onChange={(event) => {
+              setSelectedOffice(event.target.value);
+          
+            }}
+          >
+           
+            {offices.map((office) => (
+              
+              <option key={office.id}>{office.name}</option>
+            ))}
+          </Form.Select>
+        </div>
       
       <div style={{ zIndex: 998, width: "700px" }}>
+      
         <div
           className="mb-4 d-flex"
           style={{
@@ -401,11 +419,12 @@ export default function WorkPackage() {
           </div>
       <div style={{ position: "sticky", top: "600px" }}>
         <div>
-        <Button
+          {
+            rowIds.length > 0 && <Button
             data-tooltip-id="my-tooltip"
             variant="success"
             className="m-2"
-            data-tooltip-content="Received from Coder"
+            data-tooltip-content="Bulk Edit"
             onClick={() => setShow(true)}
           >
             <FontAwesomeIcon
@@ -413,6 +432,8 @@ export default function WorkPackage() {
               // onClick={() => updateReceivedFromCoder("Received from Coder")}
             />
           </Button>
+          }
+        
         </div>
         {data.length > 0 ? (
           <Table

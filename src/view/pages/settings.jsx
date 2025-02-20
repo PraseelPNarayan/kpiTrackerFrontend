@@ -25,6 +25,7 @@ import { Spinner } from "../common/spinner";
 import Errors from "../common/errors";
 import Success from "../common/success";
 import Staff from "../common/staff";
+import Office from "../common/office";
 
 export default function Settings({match}) {
   const dispatch = useDispatch();
@@ -115,6 +116,9 @@ export default function Settings({match}) {
           </Tab>
           <Tab eventKey="staff" title="Staff">
             <Staff />
+          </Tab>
+          <Tab eventKey="office" title="Office">
+            <Office />
           </Tab>
         </Tabs>
       </div>

@@ -1,35 +1,35 @@
-import React, { useEffect, useState } from "react";
-import Tab from "react-bootstrap/Tab";
-import Tabs from "react-bootstrap/Tabs";
+import React, {  useState } from "react";
+
 import { useSelector, useDispatch } from "react-redux";
 import Table from "react-bootstrap/Table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHandPointer,
   faPlusCircle,
   faUserPen,
 } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "@mui/material";
+
 import { Tooltip } from "react-tooltip";
 import { Link,Routes,Route } from "react-router-dom";
 
-import Apiservice from "../../js/api/apiService";
-import CodersForm from "./forms/codersForm";
 import {
+    officeToUpdate,
   updateSuccessFlag,
-  updateStaff,
+
 } from "../../js/reducer/kpiTrackerSlice";
-import ActionType from "../../js/actions/actionType";
+
+import ApiService from "../../js/api/apiService";
+
 
 import { Spinner } from "../common/spinner";
 import Errors from "../common/errors";
 import Success from "../common/success";
-import UsersForm from "./forms/usersForm";
 
-export default function Staff() {
+import OfficeForm from "./forms/officeForm";
+
+export default function Office() {
     const dispatch = useDispatch();
 
-    const users = useSelector((state) => state.kpiTracker.users);
+    const offices = useSelector((state) => state.kpiTracker.officeList);
     // const coderToUpdate = useSelector((state) => state.kpiTracker.coderToUpdate);
   
     const [showModal, setShowModal] = useState(false);
@@ -51,7 +51,7 @@ export default function Staff() {
   
     
         <div>
-                     <Link to={"/home/settings/addEditUser"}
+                     <Link to={"/home/settings/addEditOffice"}
                 data-tooltip-id="coders-tooltip"
                 variant="success"
                 // className="m-2"
@@ -59,7 +59,7 @@ export default function Staff() {
                   setShowModal(!showModal);
                   // setDispatchType("NewUser");
                 }}
-                data-tooltip-content="Add a Coder"
+                data-tooltip-content="Add an Office"
               >
                 <FontAwesomeIcon icon={faPlusCircle} size={"2xl"} color="green" />
               </Link>
@@ -70,25 +70,19 @@ export default function Staff() {
                   <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Email</th>
-                    <th>Office</th>
-                    <th>Active</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users &&
-                    users.map((user) => (
-                      <tr key={user.id}>
-                        <td>{user.id}</td>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{user.office.name}</td>
-                        <td>{user.isActive.toString()}</td>
+                  {offices &&
+                    offices.map((office) => (
+                      <tr key={office.id}>
+                        <td>{office.id}</td>
+                        <td>{office.name}</td>
                         <td>
-                          <Link to={`/home/settings/addEditUser`} onClick={() => { 
+                          <Link to={`/home/settings/addEditOffice`} onClick={() => { 
                                 setShowModal(!showModal);
-                              dispatch(updateStaff(user))}}>
+                              dispatch(officeToUpdate(office))}}>
                             <FontAwesomeIcon
                               icon={faUserPen}
                               size={100}
@@ -106,7 +100,7 @@ export default function Staff() {
         </div>
         <Routes>
        
-        <Route path={'settings/addUser'} component={<UsersForm />} />
+        <Route path={'settings/addOffice'} component={<OfficeForm />} />
         {/* <Route path={'settings/add/:id'} component={<CodersForm coder={coderToUpdate}/>} /> */}
     </Routes>
       </div>

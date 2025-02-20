@@ -19,17 +19,22 @@ import Table from "../common/table";
 import {
   updatePutSuccessFlag,
   selectApiStatus,
+  kpiTrackerSlice,
 } from "../../js/reducer/kpiTrackerSlice";
 import ApiService from "../../js/api/apiService";
 import Success from "../common/success";
 import Errors from "../common/errors";
 import moment from "moment";
 import { Spinner } from "../common/spinner";
+import { useAuth } from "../../js/auth/authProvider";
 
 export default function HeadersOn() {
   const data = useSelector((state) => state.kpiTracker.headersOn);
   const status = useSelector((state) => state.kpiTracker.status);
   const coders = useSelector((state) => state.kpiTracker.coders);
+  const user = useAuth()
+
+  console.log(user)
 
   // const [storeData,setData] = useState(data)
   const [apiStatus, setApiStatus] = useState(status)
@@ -42,9 +47,10 @@ export default function HeadersOn() {
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
   const toggleSpinner = useSelector((state) => state.kpiTracker.toggleSpinner);
-
   const [show, setShow] = useState(false);
   const [coder, setCoder] = useState();
+  const offices = useSelector((state) => state.kpiTracker.officeList)
+  const [selectOffice, setSelectedOffice] = useState();
   const [dateSent, setDateSent] = useState();
   const [rowIds, setRowIds] = useState([]);
   const [columnHeaders, setColumnHeaders] = useState([]);
@@ -66,6 +72,11 @@ export default function HeadersOn() {
   // };
 
   const updateRow = (data) => {
+
+    let newData = {...data,office: user.userParsed.office}
+
+    console.log(newData)
+
     dispatch(ApiService.putHeadersOn(data));
   };
 
@@ -82,6 +93,7 @@ export default function HeadersOn() {
         send_for_coding: "Yes",
         status: status,
         date_Sent_for_coding: moment().format("YYYY-MM-DDTHH:mm:ss.ssss"),
+        office : user.userParsed.office
       });
     });
 
@@ -231,6 +243,19 @@ export default function HeadersOn() {
       </Modal>
   
         <div className="pb-2" >
+        <Form.Select style={{width:'200px', display:'inline'}}
+            aria-label="Default select example"
+            onChange={(event) => {
+              setSelectedOffice(event.target.value);
+          
+            }}
+          >
+           
+            {offices.map((office) => (
+              
+              <option key={office.id}>{office.name}</option>
+            ))}
+          </Form.Select>
           <Button
             data-tooltip-id="my-tooltip"
             variant="success"

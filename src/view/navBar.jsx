@@ -30,18 +30,18 @@ import { Select } from "@mui/material";
 import { isPending } from "@reduxjs/toolkit";
 import AuthProvider, { useAuth } from "../js/auth/authProvider";
 import Roles from "../js/auth/roles";
+import { Button, Form, InputGroup } from "react-bootstrap";
 
 export default function NavBar() {
   const user = useAuth();
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  console.log( Roles.ImportDataRole.includes(user.userParsed.role))
 
   const determineClass = ({ isActive, isPending }) => {
     return isActive ? "activeLink p-3" : "primary p-3 expand";
   };
-
+  dispatch(Apiservice.getAllOffices());
   return (
     <React.Fragment>
       <div className="d-flex justify-content-start">
@@ -70,6 +70,7 @@ export default function NavBar() {
                 className={determineClass}
                 onClick={() => {
                   dispatch(Apiservice.getAllHeadersOn());
+                
                 }}
                 hidden= {Roles.HeadersOnRole.includes(user.userParsed.role)  ? false : true}
               >
@@ -95,6 +96,7 @@ export default function NavBar() {
                 onClick={() => {
                   dispatch(Apiservice.getAllCoders());
                   dispatch(Apiservice.getAllUsers());
+                
                 }}
                 
               >
@@ -140,6 +142,7 @@ export default function NavBar() {
                       <Link style={{paddingLeft: "10px"}}
                         to={`/home/settings/addEditUser`}
                         onClick={() => {
+                          dispatch(Apiservice.getAllOffices());
                           dispatch(
                             updateStaff({
                               email: user.userParsed.email,
@@ -147,6 +150,7 @@ export default function NavBar() {
                               isActive: true,
                               role: user.userParsed.role,
                               id: user.userParsed.id,
+                              office: user.userParsed.office 
                             })
                           );
                         }}
@@ -161,6 +165,7 @@ export default function NavBar() {
           </Navbar>
         </div>
         <div style={{ marginLeft: "100px" }}>
+       
           <Outlet />
         </div>
       </div>

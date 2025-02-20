@@ -77,22 +77,23 @@ const Login = () => {
         .post(baseUrl + "/login/login", payload)
         .then((response) => {
           if (response.status === 200) {
-            localStorage.setItem(
-              "token",
-              JSON.stringify({
-                // email: values.email,
-                token: response.data.loggedIn.token,
-                // isLoggedIn: true,
-              })
-            );
-
+            // localStorage.setItem(
+            //   "token",
+            //   JSON.stringify({
+            //     // email: values.email,
+            //     token: response.data.loggedIn.token,
+            //     // isLoggedIn: true,
+            //   })
+            // );
+console.log(response)
             let loginStaffPayload = {
               email: values.email,
               userName : response.data.loggedIn.userName,
               role : response.data.loggedIn.role,
               isLoggedIn: response.data.loggedIn.isLoggedIn,
               token: response.data.loggedIn.token,
-              id: response.data.loggedIn.id
+              id: response.data.loggedIn.id,
+              office: response.data.loggedIn.office
             };
             setToken(JSON.stringify(loginStaffPayload));
             dispatch(loginStaff(loginStaffPayload));

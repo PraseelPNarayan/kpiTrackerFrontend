@@ -25,6 +25,10 @@ const registerUser="CREATEUSER"
 const updateUser="UPDATEUSER"
 const fetchAllUsers="FETCHALLUSERS"
 
+const createOffice="CREATEOFFICE"
+const updateOffice="UPDATEOFFICE"
+const fetchAllOffices="FETCHALLOFFICES"
+
 
 const login="LOGIN"
 
@@ -68,7 +72,10 @@ export default {
     updateCoder,
     updateUser,
     fetchAllUsers,
-    updateBatchEntriesHeadersOn
+    updateBatchEntriesHeadersOn,
+    createOffice,
+    updateOffice,
+    fetchAllOffices
 
 
 }

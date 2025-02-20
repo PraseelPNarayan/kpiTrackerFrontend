@@ -22,6 +22,8 @@ const initialState = {
   users:[],
   userToUpdate: {},
   loggedInStaff: {},
+  officeList: [],
+  officeToUpdate : {}
 
 };
 
@@ -101,6 +103,9 @@ export const kpiTrackerSlice = createSlice({
     },
     updateStaff: (state, action) => {
       state.userToUpdate = action.payload;
+    },
+    officeToUpdate: (state, action) => {
+      state.officeToUpdate = action.payload;
     },
     loginStaff: (state,action) =>{
       state.loggedInStaff = action.payload
@@ -385,6 +390,69 @@ export const kpiTrackerSlice = createSlice({
         state.success = false;
         state.error = true;
       })
+
+
+      .addCase(Api.createOffice.pending, (state) => {
+        state.status = "pending";
+        state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
+      })
+      .addCase(Api.createOffice.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.officeList.push(action.payload);
+        state.toggleSpinner = false;
+        state.success = true;
+      })
+      .addCase(Api.createOffice.rejected, (state, action) => {
+        state.status = "failed";
+        state.errorMessage = action.error.message;
+        state.toggleSpinner = false;
+        state.error = true;
+      })
+
+      .addCase(Api.updateOffice.pending, (state) => {
+        state.success = "pending";
+        state.error = false;
+        state.errorMessage = null;
+      })
+      .addCase(Api.updateOffice.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.officeToUpdate={}
+        // action.payload.forEach(headersOn => {
+        //   let index = state.headersOn.findIndex(x => x.id === headersOn.id)
+
+        //   state.headersOn[index] = headersOn;
+
+        // })
+        // state.missingWorkPackages = action.payload;
+        state.success = true;
+      })
+      .addCase(Api.updateOffice.rejected, (state, action) => {
+        state.status = "failed";
+        state.errorMessage = action.error.message;
+        state.success = false;
+        state.error = true;
+      })
+
+      .addCase(Api.getAllOffices.pending, (state) => {
+        state.status = "pending";
+        state.toggleSpinner = true;
+        state.error = false;
+        state.errorMessage = null;
+      })
+      .addCase(Api.getAllOffices.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.officeList = action.payload;
+        state.toggleSpinner = false;
+        state.success = true;
+      })
+      .addCase(Api.getAllOffices.rejected, (state, action) => {
+        state.status = "failed";
+        state.errorMessage = action.error.message;
+        state.toggleSpinner = false;
+        state.error = true;
+      })
   },
 });
 
@@ -402,7 +470,8 @@ export const {
   updateCoder,
   updateStaff,
   loginStaff,
-  resetErrorFlag
+  resetErrorFlag,
+  officeToUpdate
 } = kpiTrackerSlice.actions;
 
 export default kpiTrackerSlice.reducer;

@@ -10,7 +10,7 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-import { object, string, boolean,ref } from "yup";
+import { object, string, boolean,ref, number } from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { Spinner } from "../spinner";
 import Errors from "../errors";
@@ -34,11 +34,13 @@ export default function UsersForm() {
     const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
     const success = useSelector((state) => state.kpiTracker.success);
     const user = useSelector((state) => state.kpiTracker.userToUpdate)
-
+    const officeList = useSelector((state) => state.kpiTracker.officeList)
+console.log(user)
       const validationSchema = object({
       email: string().email().required(),
       userName: string().required(),
       role: string().required(),
+      office:number().required(),
       isActive:boolean().required(),
       password:string().concat(!user.id ? string().required('Password is required'): null)
       .min(8, 'Password must be 8 characters long')
@@ -57,6 +59,7 @@ export default function UsersForm() {
         // id: user.id ? user.id : 0,
         email:user.id ? user.email : "",
         userName: user.id ? user.userName : "",
+        office:user.id? user.office.id:'',
         isActive: user.id ? user.isActive : true,
         role: user.id ? user.role : "",
         password: '',
@@ -64,10 +67,11 @@ export default function UsersForm() {
       },
       validationSchema: validationSchema,
       onSubmit: (values) => {
-
+console.log(values.office)
+let officeNew = officeList.filter( i => i.id === values.office)
       if(user.id)
       {
-      let userToUpdate = {...values, "id" : user.id}
+      let userToUpdate = {...values, "id" : user.id, 'office' : officeNew[0]}
     dispatch(ApiService.updateUser(userToUpdate))
       }
       else {
@@ -77,8 +81,8 @@ export default function UsersForm() {
             "username": values.userName,
             "password": values.password,
             "role": values.role,
-            "isActive" : values.isActive
-          }
+            "isActive" : values.isActive,
+            'office' : officeNew}
         dispatch(ApiService.createUser(payload))
       }
         
@@ -92,7 +96,7 @@ export default function UsersForm() {
          <Errors message={errorMessage} show={error} />
         <Spinner loadSpinner={toggleSpinner} />
         <Success
-          message={"User Updated"}
+          message={"User Loaded"}
           show={success}
           UpdateSuccessFlag={() => dispatch(updateSuccessFlag())}
         />
@@ -136,6 +140,32 @@ export default function UsersForm() {
                 style={{ margin: "10px" }}
                 disabled = {user.id ? true : false}
               />
+
+<InputLabel id="office" style={{ margin: "0px" }}>
+                Office
+              </InputLabel>
+              <Select
+                labelId="office"
+                id="office"
+                value={formik.values.office}
+                label="Office"
+                onChange={(nextValue) => {
+                  formik.setFieldValue("office", nextValue.target.value);
+                }}
+                // onBlur={formik.handleBlur}
+                style={{ margin: "10px", width:'100%' }}
+                error={formik.touched.office && Boolean(formik.errors.office)}
+                helperText={formik.touched.office && formik.errors.office}
+              >
+               
+               {officeList.map(office =>
+
+                <MenuItem value={office.id}>{office.name}</MenuItem>
+               ) 
+              }
+              </Select>
+
+
                   <InputLabel id="status" style={{ margin: "0px" }}>
                 Role
               </InputLabel>
