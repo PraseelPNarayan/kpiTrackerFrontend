@@ -4,6 +4,7 @@ import Api from "../api/apiService";
 
 import moment from "moment/moment";
 import ActionType from "../actions/actionType";
+import { faLessThan } from "@fortawesome/free-solid-svg-icons";
 
 const initialState = {
   initialWorkPackage: [],
@@ -19,12 +20,36 @@ const initialState = {
   status: "idel",
   missingWorkPackages: [],
   coderToUpdate: {},
-  users:[],
+  users: [],
   userToUpdate: {},
   loggedInStaff: {},
   officeList: [],
-  officeToUpdate : {}
-
+  officeToUpdate: {},
+  fromDate: moment({
+    year:
+      moment().month() + 1 >= 7 && moment().month() + 1 <= 12
+        ? moment().year()
+        : moment().year() - 1,
+    month: 6,
+    day: 1,
+  }),
+  toDate: moment({
+    year:
+      moment().month() >= 6 && moment().month() <= 11
+        ? moment().year() + 1
+        : moment().year(),
+    month: 5,
+    day: 30,
+  }),
+  filteredWorkpackage: [],
+  filterWPText: "",
+  filterOperatorText: "",
+  filterInspDate: "",
+  OldFilterWPText: "",
+  OldFilterOperatorText: "",
+  OldFilterInspDate: "",
+  filters: {},
+  notUploaded : []
 };
 
 export const kpiTrackerSlice = createSlice({
@@ -32,13 +57,14 @@ export const kpiTrackerSlice = createSlice({
   initialState: initialState,
   reducers: {
     updateSuccessFlag: (state, action) => {
-      state.success = !state.success;
+      state.success = false;
     },
     updatePutSuccessFlag: (state, action) => {
-      state.putSuccess = !state.putSuccess;
+      state.putSuccess = false;
     },
     updateErrorFlag: (state, action) => {
-      state.error = action.payload;
+      state.error = false;
+      state.errorMessage = null;
     },
     addInitialWorkPackage: (state, action) => {
       let copyInitialWorkPackage = [...state.workPackage];
@@ -65,6 +91,8 @@ export const kpiTrackerSlice = createSlice({
     updateMissingWP: (state, action) => {
       state.missingWorkPackages = null;
     },
+    updateNotUploaded: (state, action) => {
+      state.notUploaded = action.payload;},
     updateWorkPackageRow: (state, action) => {
       let creatWorkPackageCopy = [...state.workPackage];
       creatWorkPackageCopy[action.payload.id] = action.payload;
@@ -75,29 +103,7 @@ export const kpiTrackerSlice = createSlice({
       createHeadersOnCopy[action.payload.id] = action.payload;
       state.headersOn = createHeadersOnCopy;
     },
-    // updateHeadersOnStatus: (state, action) => {
-    //   let copyCurrentHeadersOn = [...state.headersOn];
-    //   let copyWorkPackage = [...state.workPackage];
-
-    //   action.payload.ids.map((id) => {
-    //     let toChange = copyCurrentHeadersOn[id];
-    //     toChange["status"] = action.payload.status;
-    //     toChange["Coder"] = action.payload.coder;
-    //     toChange["Date_Sent"] = action.payload.dateSent;
-    //     copyCurrentHeadersOn[id] = toChange;
-
-    //     state.headersOn[id] = toChange;
-
-    //     copyWorkPackage.forEach((i) => {
-    //       if (i.Asset_ID === toChange.Asset_ID) {
-    //         i["Sent_for_Coding"] = action.payload.dateSent;
-    //         i["Coder"] = action.payload.coder;
-    //       }
-    //     });
-    //   });
-
-    //   state.workPackage = copyWorkPackage;
-    // },
+  
     updateCoder: (state, action) => {
       state.coderToUpdate = action.payload;
     },
@@ -107,13 +113,63 @@ export const kpiTrackerSlice = createSlice({
     officeToUpdate: (state, action) => {
       state.officeToUpdate = action.payload;
     },
-    loginStaff: (state,action) =>{
-      state.loggedInStaff = action.payload
+    loginStaff: (state, action) => {
+      state.loggedInStaff = action.payload;
     },
-    resetErrorFlag:(state,action)=>{
+    resetErrorFlag: (state, action) => {
       state.error = false;
       state.errorMessage = null;
-    }
+    },
+    updateFromDate: (state, action) => {
+      state.fromDate = action.payload.fromDate;
+      state.toDate = action.payload.toDate;
+    },
+    updateFilterData: (state, action) => {
+      Object.keys(action.payload).map((k) => {
+        state.filterData[k] = action.payload[k];
+      });
+    },
+    setFilterWpText: (state, action) => {
+      state.filterWPText = action.payload;
+    },
+    setFilterOperatorText: (state, action) => {
+      state.filterOperatorText = action.payload;
+    },
+    setFilterInspDate: (state, action) => {
+
+      state.filterInspDate = action.payload;
+    },
+    setFilteredWP: (state, action) => {
+      const {filterName, filterValue} = action.payload
+     
+
+      if(filterValue){state.filters[filterName]=filterValue}
+      else {delete state.filters[filterName]}
+
+            state.filteredWorkpackage = state.workPackage.filter((wp) => {
+       return Object.keys(state.filters).every((filter)=>{
+     
+        if(filter ==='wp')
+        {
+          return wp.wp.toLowerCase() === state.filters[filter].toLowerCase();
+        }
+        if(filter ==='operator')
+          {
+            return wp.operator !== null && wp.operator.toLowerCase().match(state.filters[filter].toLowerCase());
+          }
+        if(filter ==='inspDate')
+          {
+            return wp.inspection_Date !== null && wp.inspection_Date === state.filters[filter];
+          }
+       })
+      
+      });
+
+    },
+    deleteDate: (state, action) => {
+      delete state.filterInspDate;
+  
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -127,11 +183,14 @@ export const kpiTrackerSlice = createSlice({
         state.status = "succeeded";
         // let copyCurrentState = [...state.headersOn]
         // copyCurrentState.push(action.payload);
-        state.headersOn = action.payload;
+        // state.headersOn = action.payload;
+        state.missingWorkPackages = action.payload;
+    
         state.toggleSpinner = false;
         state.success = true;
       })
       .addCase(Api.postCreateHeadersOn.rejected, (state, action) => {
+     
         state.status = "failed";
         state.errorMessage = action.error.message;
         state.toggleSpinner = false;
@@ -161,15 +220,18 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putHeadersOn.fulfilled, (state, action) => {
         state.status = "succeeded";
-       let index = state.headersOn.findIndex(x => x.id === action.payload.id)
-       state.headersOn[index] = action.payload
+        let index = state.headersOn.findIndex(
+          (x) => x.id === action.payload.id
+        );
+        state.headersOn[index] = action.payload;
         state.putSuccess = true;
       })
       .addCase(Api.putHeadersOn.rejected, (state, action) => {
         state.status = "failed";
-        state.error =action.error.message;
+        state.error = action.error.message;
         state.errorMessage = action.error.message;
         state.putSuccess = false;
+        state.success = false;
       })
       .addCase(Api.putHeadersOnBatch.pending, (state) => {
         state.success = "pending";
@@ -194,19 +256,18 @@ export const kpiTrackerSlice = createSlice({
         state.error = true;
       })
       .addCase(Api.putHeadersOnBatchEntries.pending, (state) => {
-        state.success = "pending";
+        state.success = false;
         state.error = false;
         state.errorMessage = null;
       })
       .addCase(Api.putHeadersOnBatchEntries.fulfilled, (state, action) => {
         state.status = "succeeded";
-        action.payload.forEach(response => {
-          let index = state.headersOn.findIndex(x => x.id === response.id)
+        action.payload.forEach((response) => {
+          let index = state.headersOn.findIndex((x) => x.id === response.id);
 
           state.headersOn[index] = response;
+        });
 
-        })
-    
         state.success = true;
       })
       .addCase(Api.putHeadersOnBatchEntries.rejected, (state, action) => {
@@ -233,7 +294,7 @@ export const kpiTrackerSlice = createSlice({
         state.toggleSpinner = false;
         state.error = true;
       })
-      .addCase(Api.getAllWorkpackages.pending, (state,action) => {
+      .addCase(Api.getAllWorkpackages.pending, (state, action) => {
         state.status = "pending";
         state.toggleSpinner = true;
         state.error = false;
@@ -241,7 +302,8 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.getAllWorkpackages.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.workPackage=action.payload;
+        state.workPackage = action.payload;
+        state.filteredWorkpackage = action.payload;
         state.toggleSpinner = false;
       })
       .addCase(Api.getAllWorkpackages.rejected, (state, action) => {
@@ -302,7 +364,6 @@ export const kpiTrackerSlice = createSlice({
         let index = state.coders.findIndex((x) => x.id === action.payload.id);
 
         state.coders[index] = action.payload;
-
       })
       .addCase(Api.updateCoder.rejected, (state, action) => {
         state.status = "failed";
@@ -340,7 +401,6 @@ export const kpiTrackerSlice = createSlice({
         state.toggleSpinner = false;
         let index = state.users.findIndex((x) => x.id === action.payload.id);
         state.users[index] = action.payload;
-
       })
       .addCase(Api.updateUser.rejected, (state, action) => {
         state.status = "failed";
@@ -369,18 +429,19 @@ export const kpiTrackerSlice = createSlice({
       })
 
       .addCase(Api.putWorkpackagesBatch.pending, (state) => {
-        state.success = "pending";
+        state.success = false;
         state.error = false;
         state.errorMessage = null;
       })
       .addCase(Api.putWorkpackagesBatch.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // action.payload.forEach(headersOn => {
-        //   let index = state.headersOn.findIndex(x => x.id === headersOn.id)
+        action.payload.forEach(wp => {
+          let index = state.workPackage.findIndex(x => x.id === wp.id)
+       
 
-        //   state.headersOn[index] = headersOn;
+          state.workPackage[index] = wp;
 
-        // })
+        })
         // state.missingWorkPackages = action.payload;
         state.success = true;
       })
@@ -390,7 +451,6 @@ export const kpiTrackerSlice = createSlice({
         state.success = false;
         state.error = true;
       })
-
 
       .addCase(Api.createOffice.pending, (state) => {
         state.status = "pending";
@@ -412,13 +472,13 @@ export const kpiTrackerSlice = createSlice({
       })
 
       .addCase(Api.updateOffice.pending, (state) => {
-        state.success = "pending";
+        state.success = false;
         state.error = false;
         state.errorMessage = null;
       })
       .addCase(Api.updateOffice.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.officeToUpdate={}
+        state.officeToUpdate = {};
         // action.payload.forEach(headersOn => {
         //   let index = state.headersOn.findIndex(x => x.id === headersOn.id)
 
@@ -448,11 +508,12 @@ export const kpiTrackerSlice = createSlice({
         state.success = true;
       })
       .addCase(Api.getAllOffices.rejected, (state, action) => {
-        state.status = "failed";
-        state.errorMessage = action.error.message;
         state.toggleSpinner = false;
+        state.success = false;
+        state.status = "failed";
         state.error = true;
-      })
+        state.errorMessage = action.error.message;
+      });
   },
 });
 
@@ -469,12 +530,20 @@ export const {
   updateMissingWP,
   updateCoder,
   updateStaff,
+  updateFromDate,
+  updateFilterData,
   loginStaff,
   resetErrorFlag,
-  officeToUpdate
+  officeToUpdate,
+  setFilteredWP,
+  setFilterWpText,
+  setFilterOperatorText,
+  setFilterInspDate,
+  deleteDate,
+  updateNotUploaded
 } = kpiTrackerSlice.actions;
 
 export default kpiTrackerSlice.reducer;
 
 export const selectApiStatus = (state) => state.kpiTracker.status;
-export const workPackage =(state) => state.kpiTracker.workPackage
+export const workPackage = (state) => state.kpiTracker.filteredWorkpackage;

@@ -156,16 +156,28 @@ a {
  max-width: 200px;
 }
 
-#navBar:hover .navText {
-  display: block;
-  color: var(--color1);
-  font-weight: 500;
-  transition: display 1s ease-out;
-}
+/* .navText {
+  display: none;
+} */
 
 .navText {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+  color: var(--color1);
+  font-weight: 500;
 }
+#navBar:hover .navText {
+  opacity: 1;
+  visibility: visible;
+  /* display: block;
+  color: var(--color1);
+  font-weight: 500;
+  /* transition: display -1s ease-out;  
+  opacity: 1;
+  transition: opacity 1s ease-out; */
+}
+
 
 .expand:hover {
   background-color: #7bc143;
@@ -222,25 +234,6 @@ a {
   gap: 10px;
   font-weight: 500;
 }
-
-/* .expand:hover {
-
-  background-color: #7bc143;
-  transition: all 0.5s ease-in-out;
-  width: 100%;
-  svg {
-    color: var(--dark);
- 
-  }
-  .navText {
-    display: block;
-    color: var(--dark);
-  }
-} */
-
-/* .expand:hover + nav{
-  width: 300px;
-} */
 
 .activeLink {
   display: flex;
@@ -306,6 +299,7 @@ a {
   padding-right: 20px;
   padding-left: 20px;
   justify-content: space-between;
+  margin-right: 10px;
 
 }
 .cardTitle{

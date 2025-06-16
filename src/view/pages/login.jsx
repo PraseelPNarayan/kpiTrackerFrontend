@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { TextField, FormControl, Button, FormLabel } from "@mui/material";
+import { TextField,  Button, FormLabel } from "@mui/material";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { object, string, boolean, ref } from "yup";
-import { replace, useFormik } from "formik";
+import { object, string,  } from "yup";
+import {  useFormik } from "formik";
 import axios from "axios";
 
-import ApiService, { baseUrl } from "../../js/api/apiService";
+import { baseUrl } from "../../js/api/apiService";
 import Errors from "../common/errors";
 import { loginStaff,resetErrorFlag } from "../../js/reducer/kpiTrackerSlice";
-import { useNavigate, Routes, Route, redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../js/auth/authProvider";
 
 const Login = () => {
@@ -64,7 +64,7 @@ const Login = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      dispatch(resetErrorFlag);
+      dispatch(resetErrorFlag());
       setLoginButtonDisabled(true);
       let payload = {
         email: values.email,
@@ -72,21 +72,11 @@ const Login = () => {
       };
 
       if (error) setShowError(false);
-
       axios
         .post(baseUrl + "/login/login", payload)
         .then((response) => {
           if (response.status === 200) {
-            // localStorage.setItem(
-            //   "token",
-            //   JSON.stringify({
-            //     // email: values.email,
-            //     token: response.data.loggedIn.token,
-            //     // isLoggedIn: true,
-            //   })
-            // );
-console.log(response)
-            let loginStaffPayload = {
+                   let loginStaffPayload = {
               email: values.email,
               userName : response.data.loggedIn.userName,
               role : response.data.loggedIn.role,
@@ -98,7 +88,7 @@ console.log(response)
             setToken(JSON.stringify(loginStaffPayload));
             dispatch(loginStaff(loginStaffPayload));
             // navigate("/home/importdata", { replace: true });
-         
+       
           }
         })
         .catch((error) => {
@@ -109,7 +99,7 @@ console.log(response)
               "Looks like Authentication did not pass. Either email or password is incorrect or you are not allowed to login"
             );
           }
-          if (error.status === 500) {
+        else if (error.status === 500) {
             setShowError(true);
             setShowErrorMessage(
               "There is an issue with your login, please try with correct credentials"
@@ -124,9 +114,20 @@ console.log(response)
 
   return (
     <React.Fragment>
+        <div>
+        {window.location.origin === 'http://172.16.1.12:9000' || window.location.origin === 'http://localhost:9000' || window.location.origin === 'http://localhost:3000' ? 
+        (
+          <div style={{width:'100%', backgroundColor:"red", color:'white', padding: '10px', textAlign:'center'}}>
+This is UAT Environment
+            </div>
+        )
+        :
+        null
+      }
+      </div>
           <Errors show={error} message={errorMessage} showHeading={false} />
       <div className="loginPage">
-        <div style={{position:'absolute', top:'10px', left:'10px'}}>
+        <div style={{position:'absolute', top:'40px', left:'10px'}}>
 
         <img
           className="m-1"

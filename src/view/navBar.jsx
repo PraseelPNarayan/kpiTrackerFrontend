@@ -23,17 +23,16 @@ import {
   faKey,
 } from "@fortawesome/free-solid-svg-icons";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
 import Apiservice from "../js/api/apiService";
-import { loginStaff, updateStaff } from "../js/reducer/kpiTrackerSlice";
-import { Select } from "@mui/material";
-import { isPending } from "@reduxjs/toolkit";
-import AuthProvider, { useAuth } from "../js/auth/authProvider";
+import { loginStaff, updateStaff,resetErrorFlag } from "../js/reducer/kpiTrackerSlice";
+import  { useAuth } from "../js/auth/authProvider";
 import Roles from "../js/auth/roles";
-import { Button, Form, InputGroup } from "react-bootstrap";
+
 
 export default function NavBar() {
   const user = useAuth();
+   const defaultFromDate = useSelector((state)=> state.kpiTracker.fromDate)
+    const defaultToDate = useSelector((state)=> state.kpiTracker.toDate)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,9 +40,19 @@ export default function NavBar() {
   const determineClass = ({ isActive, isPending }) => {
     return isActive ? "activeLink p-3" : "primary p-3 expand";
   };
-  dispatch(Apiservice.getAllOffices());
+  // dispatch(Apiservice.getAllOffices());
   return (
     <React.Fragment>
+       {window.location.origin === 'http://172.16.1.12:9000' || window.location.origin === 'http://localhost:9000' || window.location.origin === 'http://localhost:3000' ? 
+        (
+          <div style={{width:'100%', backgroundColor:"red", color:'white', padding: '10px', textAlign:'center'}}>
+This is UAT Environment
+            </div>
+        )
+        :
+        null
+      }
+         
       <div className="d-flex justify-content-start">
         <div>
           <Navbar
@@ -81,7 +90,9 @@ export default function NavBar() {
                   <label className="navText">Headers</label>
                 </div>
               </NavLink>
-              <NavLink to={"/home/workPackage"} className={determineClass}   hidden= {Roles.WorkPackageRole.includes(user.userParsed.role)  ? false : true}>
+              <NavLink to={"/home/workPackage"} className={determineClass}   hidden= {Roles.WorkPackageRole.includes(user.userParsed.role)  ? false : true} 
+              onClick={() => dispatch(Apiservice.getAllWorkpackages({fromDate:defaultFromDate.format("YYYY-MM-DDTHH:mm:ss.ssss"), toDate: defaultToDate.format("YYYY-MM-DDTHH:mm:ss.ssss")      }))}
+              >
                 <div className="">
                   <FontAwesomeIcon icon={faLock} size="1x" />
                 </div>
@@ -96,7 +107,7 @@ export default function NavBar() {
                 onClick={() => {
                   dispatch(Apiservice.getAllCoders());
                   dispatch(Apiservice.getAllUsers());
-                
+                  dispatch(Apiservice.getAllOffices());
                 }}
                 
               >
@@ -138,7 +149,7 @@ export default function NavBar() {
                       <label className="p-2">Logout</label>
                     </div>
                     <div className="linkHover">
-                      <FontAwesomeIcon icon={faKey} title="Logout" />
+                      <FontAwesomeIcon icon={faKey} title="Logout" onClick={resetErrorFlag()} />
                       <Link style={{paddingLeft: "10px"}}
                         to={`/home/settings/addEditUser`}
                         onClick={() => {
@@ -153,6 +164,7 @@ export default function NavBar() {
                               office: user.userParsed.office 
                             })
                           );
+                          
                         }}
                       >
                         <label>Change Details</label>
@@ -165,7 +177,7 @@ export default function NavBar() {
           </Navbar>
         </div>
         <div style={{ marginLeft: "100px" }}>
-       
+      
           <Outlet />
         </div>
       </div>

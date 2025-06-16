@@ -47,7 +47,7 @@ const Routes =()=>{
           ],
         },
         { path: "/login", element: <Login />, index: true },
-        { path: "*", element: <NotFound /> },
+        { path: "*", element: <Login /> },
       ]);
 return <RouterProvider router={routes}/>
 }

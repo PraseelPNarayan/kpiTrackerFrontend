@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   DataGrid,
   gridPageSelector,
@@ -8,7 +9,7 @@ import {
   useGridSelector,
 } from "@mui/x-data-grid";
 import Pagination from "@mui/material/Pagination";
-import { Box } from "@mui/material";
+import { Box, Select, MenuItem, InputLabel } from "@mui/material";
 
 export default function Table({
   tableData,
@@ -17,16 +18,24 @@ export default function Table({
   HandleStatusChange,
   colHeaders,
   editTable = true,
+  rowCss,
 }) {
   const [data, setTableData] = useState(tableData);
+  const [removeFilters, setRemoveFilters] = useState(tableData);
+  const [pageSizeValue, setPageSize] = useState(100);
+
+  const filterRules = useSelector((state) => state.kpiTracker.filterData);
+  // const data = useSelector((state) => state.kpiTracker.workPackage);
+
   const [paginationModel, setpaginationModel] = useState({
-    pageSize: 15,
+    pageSize: pageSizeValue,
     page: 0,
   });
 
   useEffect(() => {
-    setTableData(tableData);
-  }, [tableData]);
+     setTableData(tableData);
+    // handleFilteredData();
+  }, [tableData,pageSizeValue]);
 
   const Toolbar = () => {
     const apiRef = useGridApiContext();
@@ -47,23 +56,81 @@ export default function Table({
     );
   };
 
+  // const handleFilteredData = () => {
+  //   if (tableData.length > 0) {
+  //     if (Object.keys(filterRules).length > 0) {
+  //       const filteredDataSet = [...tableData];
+  //       if (filterRules.wp) {
+  //         setTableData(
+  //           filteredDataSet.filter(
+  //             (w) => w.wp.toLowerCase() === filterRules.wp.toLowerCase()
+  //           )
+  //         );
+  //       }
+  //       if (filterRules.operator) {
+  //         setTableData(
+  //           filteredDataSet.filter(
+  //             (w) =>
+  //               w.operator !== null &&
+  //               w.operator
+  //                 .toLowerCase()
+  //                 .match(filterRules.operator.toLowerCase())
+  //           )
+  //         );
+  //       }
+  //     }
+  //   }
+  // };
   return (
     <div style={{ width: "100%" }}>
-       <Box
-        sx={(theme) =>({
-          height: "600px",
+      {/* <InputLabel id="pageSize" style={{ margin: "0px" }}>
+          Page Size
+        </InputLabel>
+        <Select
+          labelId="pageSize"
+          id="pageSize"
+          value={pageSizeValue}
+          label="Page Size"
+          onChange={(nextValue) => {
+           
+            setPageSize(nextValue.target.value);
+          }}
+          // onBlur={formik.handleBlur}
+          style={{ margin: "10px", width: "100px" }}
+        
+        >
+          <MenuItem value={15}>15</MenuItem>
+          <MenuItem value={30}>30</MenuItem>
+          <MenuItem value={100}>100</MenuItem>
+         
+        </Select> */}
+      <Box
+        sx={(theme) => ({
+          height: "auto",
           width: "100%",
-          '& .MuiDataGrid-cell--editable': {
-            bgcolor: 'rgb(217 243 190)',
-            ...theme.applyStyles('dark', {
-              bgcolor: '#376331',
+          "& .MuiDataGrid-cell--editable": {
+            bgcolor: "rgb(217 243 190)",
+            ...theme.applyStyles("dark", {
+              bgcolor: "#376331",
             }),
+          },
+          "& .duplicate.true": {
+            backgroundColor: "#d47483",
+            color: "#1a3e72",
+            fontWeight: "600",
+          },
+
+          "& .duplicate.false": {
+            backgroundColor: "white",
+            color: "black",
+            fontWeight: "600",
           },
         })}
       >
         <DataGrid
           hideFooter
           paginationModel={paginationModel}
+          // initialState={{ pagination: { paginationModel} }}
           onPaginationModelChange={setpaginationModel}
           slots={{
             toolbar: Toolbar,
@@ -87,8 +154,7 @@ export default function Table({
           rows={data}
           // isCellEditable={(params) => params.isEditable? true : false}
           columns={colHeaders}
-          initialState={{ pagination: { paginationModel: { pageSize: 15 } } }}
-          pageSizeOptions={[10, 15, 20]}
+          // pageSizeOptions={[30, 60, 100, { value: -1, label: 'All' }]}
           sx={{
             bgcolor: "background.paper",
             boxShadow: 2,
@@ -98,6 +164,7 @@ export default function Table({
               color: "primary.main",
             },
           }}
+          getRowClassName={rowCss}
         />
       </Box>
       {/* </Box> */}

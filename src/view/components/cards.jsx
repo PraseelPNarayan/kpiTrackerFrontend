@@ -10,10 +10,10 @@ import {
 import { faAnchorLock, faAtom, faChartLine } from '@fortawesome/free-solid-svg-icons';
 
 export default function Cards({title,subtitle}) {
-    console.log(title,subtitle)
+ 
   return (
  <React.Fragment>
-    <div className='customCard m-2'>
+    <div className='customCard'>
             <div className='text-center cardVector'>
                 <FontAwesomeIcon icon={faChartLine} size='2x' color='white' />
             </div>

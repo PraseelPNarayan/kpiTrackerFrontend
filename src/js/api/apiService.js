@@ -2,12 +2,12 @@
 import axios from "axios";
 import Types from "../actions/actionType";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import moment from "moment";
-import { useSelector } from "react-redux";
-import { selectApiStatus } from "../reducer/kpiTrackerSlice";
 
 
-export const baseUrl= "https://localhost:7192/api"
+export const baseUrl= "http://localhost:5278/api"
+// export const baseUrl= "http://172.16.1.12:5000/api"
+// export const baseUrl= process.env.REACT_APP_KPITRACKERAPI
+// export const baseUrl= "http://172.16.1.12:5040/api"
 
 const getAllHeadersOn=createAsyncThunk(Types.fetchAllHeadersOn, async ()=>{
  
@@ -167,15 +167,16 @@ const initialWorkPackageFields = [
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-        { label: "Yes", value: "Yes" },
-        { label: "Yes and Added", value: "Yes and Added" },
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
     type:"singleSelect",
-    valueOptions: ['Yes','Added', 'Yes and Added'],
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
 
-    example: "Added",
+    example: "Contracted",
   },
   {
     label: "Asset ID",
@@ -247,6 +248,12 @@ const initialWorkPackageFields = [
 
 const workPackageFields = [
   {
+    label: "Duplicate and Latest",
+    key: "duplicateAndLatest",
+    fieldType: { type: "input" },
+    editable : false
+  },
+  {
     label: "Id",
     key: "id",
 
@@ -255,16 +262,7 @@ const workPackageFields = [
     },
     editable : false
   },
-  {
-    label: "Status",
-    key: "status",
-
-    fieldType: {
-      type: "input",
-    },
-editable :false
-  },
-  {
+   {
     label: "WP",
     key: "wp",
 
@@ -287,23 +285,22 @@ editable :false
   {
     label: "Urgent",
 
-    key: "urgent",
+    key: "Urgent",
 
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-
-        { label: "Yes", value: "Yes" },
-        { label: "Add", value: "Add" },     
-           { label: "Yes and Added", value: "Yes and Added" }
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
+    type:"singleSelect",
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
 
-    example: "Added",
-    type:'singleSelect',
-    valueOptions:['Yes', 'Added', 'Yes and Added'],
-    editable : false
+    example: "Contracted",
+    editable: false
   },
   {
     label: "Asset ID",
@@ -402,19 +399,23 @@ editable :false
     key: "received_Date",
 
     fieldType: {
-      type: "date",
+      type: "datetime",
     },
 
     example: "yyyy-mm-dd",
-    editable : false
-    // type:'date'
+    editable : false,
+    type:'datetime'
   },
   {
     label: "Inspection Date",
     key: "inspection_Date",
-    fieldType: { type: "date" },
-     example: "yyyy-mm-dd",
-     editable : false
+  
+    
+     editable : false,
+    
+     fieldType: { type: "dateTime" },
+     example: "dd-mm-yyyy",
+     type:'dateTime'
   },
   {
     label: "Rego",
@@ -449,7 +450,8 @@ editable :false
     fieldType: { type: "date" },
     example: "44838",
         // type:'date',
-        editable : false
+        editable : false,
+        type:'date'
      
   },
   {
@@ -608,13 +610,13 @@ editable :false
   {
     label: "Batch Date",
     key: "batch_Date",
-    fieldType: { type: "input" },
-    example: "",
-        type:'date'
+     fieldType: { type: "dateTime" },
+     example: "dd-mm-yyyy",
+     type:'dateTime'
   },
   {
-    label: "if Re-batched, old Batch ID#",
-    key: "old_Batch_No",
+    label: "WINCAN_PROJECT_ID_#",
+    key: "wincan_project_id",
     fieldType: { type: "input" },
     example: "",
   },
@@ -629,12 +631,16 @@ editable :false
     key: "general_Comments_Field_App",
     fieldType: { type: "input" },
     example: "",
+    flex:1,
+    minWidth:500
   },
   {
     label: "General Comments ( From MOATA )",
     key: "general_Comments_Moata",
     fieldType: { type: "input" },
     example: "U/S Inlet, D/S Outlet no depths",
+    flex:1,
+    minWidth:500
   },
   // {
   //   label: "Time of Inspection",
@@ -648,6 +654,7 @@ editable :false
     fieldType: { type: "input" },
     example: "",
   },
+
 ];
 
 const dailyReportFields = [
@@ -679,13 +686,16 @@ const dailyReportFields = [
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-        { label: "Yes", value: "Yes" },
-        { label: "Yes and Added", value: "Yes and Added" },
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
+    type:"singleSelect",
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
 
-    example: "Added",
+    example: "Contracted",
   },
   {
     label: "Asset_ID",
@@ -858,6 +868,7 @@ const dailyReportFields = [
     key: "Date_of_Inspection",
     fieldType: { type: "input" },
     example: "21 Foxlaw Street Randwick Park",
+   
   },
   // {
   //   label: "Time_of_Inspection",
@@ -1046,10 +1057,10 @@ const dailyReportFields = [
 
 const headersOnFields = [
   {
-    label: "status",
-    key: "status",
+    label: "Duplicate and Latest",
+    key: "duplicateAndLatest",
     fieldType: { type: "input" },
-    example: "",
+    editable : false
   },
   {
     label: "id",
@@ -1060,19 +1071,21 @@ const headersOnFields = [
   {
     label: "Urgent",
 
-    key: "urgent",
+    key: "Urgent",
 
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-        { label: "Yes", value: "Yes" },
-        { label: "Yes and Added", value: "Yes and Added" },
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
     type:"singleSelect",
-    valueOptions: ['Yes','Added', 'Yes and Added'],
-    example: "Added",
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
+
+    example: "Contracted",
   },
   {
     label: "Batch_ID",
@@ -1142,11 +1155,11 @@ const headersOnFields = [
     type:'dateTime'
   },
   {
-    label: "Date Receieved from Coder",
+    label: "Date Received from Coder",
     key: "date_Received_From_Coder",
     fieldType: { type: "input" },
     example: "dd-mm-yyyy",
-     type:'date'
+     type:'dateTime'
   },
   // {
   //   label: "Time_of_Inspection",

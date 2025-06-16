@@ -19,7 +19,7 @@ let decoded =token && token.token ?  jwtDecode(token.token) : null
 let tokenExpired = null
 if(decoded)
 {
-  console.log(decoded)
+
   // tokenExpired = moment.unix(decoded.exp).format('DD/MM/YYYY hh:mm:ss') < moment().format('DD/MM/YYYY hh:mm:ss')
 tokenExpired = moment.unix(decoded.exp) < moment()
 }

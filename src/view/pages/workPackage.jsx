@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
   Button,
-Form,
+  Form,
   CardHeader,
   CardBody,
   CardTitle,
@@ -11,46 +11,89 @@ Form,
 import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCross,
+  faFilter,
   faMagnifyingGlass,
- faPenToSquare
+  faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { Skeleton, Box } from "@mui/material";
+import {
+  Skeleton,
+  Box,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import Modal from "react-bootstrap/Modal";
+import { makeStyles } from "@mui/styles";
 
 import Table from "../common/table";
 import ApiService from "../../js/api/apiService";
 import moment from "moment";
-import { FormHelperText, InputLabel } from "@mui/material";
 
 import Success from "../common/success";
 import Errors from "../common/errors";
 import { Spinner } from "../common/spinner";
-import { workPackage,updatePutSuccessFlag } from "../../js/reducer/kpiTrackerSlice";
+import {
+  workPackage,
+  updatePutSuccessFlag,
+  updateFilterData,
+  setFilteredWP,
+  setFilterOperatorText,
+  setFilterWpText,
+  setFilterInspDate,
+  deleteDate,
+} from "../../js/reducer/kpiTrackerSlice";
 import Cards from "../components/cards";
+import clsx from "clsx";
+import WpAdvancedSearch from "../common/wpAdvancedSearch";
+import WpMultiEdit from "../components/wpMultiEdit";
+const useStyles = makeStyles({
+  red: {
+    color: "red",
+  },
+  black: {
+    color: "black",
+  },
+});
 
 export default function WorkPackage() {
-  const data = useSelector(workPackage);
+  let filterPayload = { wp: "", operator: "", inspDate: "" };
+
+  const classes = useStyles();
+
+  const data = useSelector((state) => state.kpiTracker.workPackage);
   const status = useSelector((state) => state.kpiTracker.status);
   const toggleSpinner = useSelector((state) => state.kpiTracker.toggleSpinner);
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
-  const offices = useSelector((state) => state.kpiTracker.officeList)
+  const offices = useSelector((state) => state.kpiTracker.officeList);
+  const defaultFromDate = useSelector((state) => state.kpiTracker.fromDate);
+  const defaultToDate = useSelector((state) => state.kpiTracker.toDate);
+  const dateSet = useSelector((state) => state.kpiTracker.filterInspDate);
 
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [apiStatusChanged, setApiStatusChanged] = useState(status);
   // const [data, setData] = useState(storeData);
-  const [fromDate, setFromDate] = useState();
-  const [toDate, setToDate] = useState();
+  const [fromDate, setFromDate] = useState(
+    defaultFromDate.format("YYYY-MM-DDTHH:mm:ss.ssss")
+  );
+  const [toDate, setToDate] = useState(
+    defaultToDate.format("YYYY-MM-DDTHH:mm:ss.ssss")
+  );
   const [showError, setShowError] = useState(error);
-  const [showErrorMessage, setShowErrorMessage] = useState(errorMessage)
+  const [showErrorMessage, setShowErrorMessage] = useState(errorMessage);
   const [pagedData, setPagedData] = useState();
   const [rowIds, setRowIds] = useState([]);
   const [show, setShow] = useState(false);
   const [selectOffice, setSelectedOffice] = useState();
+  const [advancedFilterShow, setadvancedFilterShow] = useState(false);
+  // const [filterWp, setFilterWP] = useState("");
+  // const [filterOperator, setFilterOperator] = useState("");
+  // const [filterInspDate, setFilterInspDate] = useState();
 
   const dispatch = useDispatch();
 
@@ -58,35 +101,21 @@ export default function WorkPackage() {
     (state) => state.kpiTracker.success
   );
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  let completeionStatusValue = null;
-  let completeionCharacterizationValue = null;
-  let characterizationValue = null;
-
-  const completeionStatus = ApiService.workPackageFields.filter(v => v.label === 'Completion Status')
-  const completeionCharacterization = ApiService.workPackageFields.filter(v => v.label === 'Completion Characterization')
-  const characterization = ApiService.workPackageFields.filter(v => v.label === 'Characterization')
 
   useEffect(() => {
     loadTableHeaders();
-
-    //  setData(storeData);
-
-    // setApiStatusChanged(status)
   }, [data]);
 
   const updateRowInStore = (data) => {
-    let payload = []
-    payload.push(data)
+    let payload = [];
+    payload.push(data);
     // console.log(payload)
-     dispatch(ApiService.putWorkpackagesBatch
-      (payload))
+    dispatch(ApiService.putWorkpackagesBatch(payload));
   };
 
   const loadAllWorkPackages = () => {
     if (fromDate > toDate) {
-      setShowErrorMessage("From date cannot be past to date")
+      setShowErrorMessage("From date cannot be past to date");
       setShowError(true);
     } else {
       if (showError) {
@@ -111,7 +140,7 @@ export default function WorkPackage() {
   const loadTableHeaders = () => {
     let tempCol = [];
     if (data && data.length > 0)
-      ApiService.workPackageFields.map((columnHeader) => {
+      ApiService.workPackageFields.map((columnHeader, i) => {
         let schema = {
           field: columnHeader.key,
           headerName: columnHeader.label,
@@ -121,8 +150,25 @@ export default function WorkPackage() {
           valueOptions: columnHeader.valueOptions
             ? columnHeader.valueOptions
             : null,
+          flex: 1,
+          minWidth: columnHeader.minWidth ? columnHeader.minWidth : 100,
         };
-
+        if (columnHeader.type && columnHeader.type === "date") {
+          let dateParams = {
+            valueGetter: (value, row) => (row[i] ? new Date(row[i]) : null),
+          };
+          schema = { ...schema, ...dateParams };
+        }
+        if (columnHeader.type && columnHeader.type === "dateTime") {
+          let dateParams = {
+            valueGetter: (value, row) =>
+              // console.log(value, row)
+              value ? new Date(value) : null,
+            //  console.log('found ',row.date_of_Inspection)
+            // row[i] ? moment(row.date_of_Inspection).format('yyyy-mm-dd hh:mm') : null,
+          };
+          schema = { ...schema, ...dateParams };
+        }
         // if (columnHeader.type && columnHeader.type === "date") {
         //   let dateParams = {
         //     valueGetter: (value, row) =>
@@ -137,303 +183,196 @@ export default function WorkPackage() {
 
   const initialValue = 0;
 
-    let filteredData = [];
-    if (pagedData) {
-      pagedData.map((v) => {
-        let index = data.find((x) => x.id === v);
+  let filteredData = [];
+  if (pagedData) {
+    pagedData.map((v) => {
+      let index = data.find((x) => x.id === v);
 
-
-        filteredData.push(index);
-      });
-    } else {
-      filteredData.push(data);
-    }
-    let totalGisLength = 0
-    let submittedInMoata = 0
-    let withCoder = 0
-    if(filteredData)
-    {
-
-       totalGisLength = filteredData.reduce(
-        (a, v) => a + v.giS_Length,
-        initialValue
-      );
-       submittedInMoata = data
-        .filter((x) => x.status === "To Upload")
-        .reduce((a, v) => a + v.giS_Length, initialValue);
-       withCoder = data
-        .filter((x) => x.coder != null)
-        .reduce((a, v) => a + v.giS_Length, initialValue);
-    }
-       
-
-  // const reports = () => {
-  //   const initialValue = 0;
-
-  //   let filteredData = [];
-  //   if (pagedData) {
-  //     pagedData.map((v) => {
-  //       let index = data.find((x) => x.id === v);
-
-
-  //       filteredData.push(index);
-  //     });
-  //   } else {
-  //     filteredData.push(data);
-  //   }
-  //   let totalGisLength = 0
-  //   let submittedInMoata = 0
-  //   let withCoder = 0
-  //   if(filteredData)
-  //   {
-
-  //      totalGisLength = filteredData.reduce(
-  //       (a, v) => a + v.giS_Length,
-  //       initialValue
-  //     );
-  //      submittedInMoata = data
-  //       .filter((x) => x.status === "To Upload")
-  //       .reduce((a, v) => a + v.giS_Length, initialValue);
-  //      withCoder = data
-  //       .filter((x) => x.coder != null)
-  //       .reduce((a, v) => a + v.giS_Length, initialValue);
-  //   }
-       
-  //   return (
-   
-  //       <div>
-  //         <Card title="GIS Meters" subtitle= {Math.round((totalGisLength + Number.EPSILON) * 100) / 100} />
-  //         <Card title="Submitted in Moata" subtitle= {submittedInMoata} />
-  //         <Card title="With Coder" subtitle= {withCoder} />
-  //         {/* <h5>
-  //           <span className="badge bg-secondary m-1">
-  //             GIS Meters:{" "}
-  //             {Math.round((totalGisLength + Number.EPSILON) * 100) / 100}
-  //           </span>
-  //         </h5>
-  //         </div>
-  //         <div>
-  //         <h5>
-  //           <span className="badge bg-secondary m-1">
-  //             Submitted in Moata : {submittedInMoata}
-  //           </span>
-  //         </h5>
-  //         </div>
-  //         <div>
-  //         <h5>
-  //           <span className="badge bg-secondary m-1">
-  //             With Coder : {withCoder}
-  //           </span>
-  //         </h5> */}
-  //       </div>
-    
-  //   );
-  // };
-
-  const updateSetStatus = () => {
-    let workpackagesToUpdate = [];
-
-    rowIds.forEach((y) => {
-      let copyWorkpackages = [...data];
-      let foundWorkpackages = copyWorkpackages.findIndex((x) => x.id === y);
-
-      workpackagesToUpdate.push({
-        ...copyWorkpackages[foundWorkpackages],
-        completion_Status : completeionStatusValue,
-        completion_Characterization : completeionCharacterizationValue,
-        characterization : characterizationValue
-      });
+      filteredData.push(index);
     });
+  } else {
+    filteredData.push(data);
+  }
+  let totalGisLength = 0;
+  let submittedInMoata = 0;
+  let withCoder = 0;
 
- 
-    dispatch(ApiService.putWorkpackagesBatch(workpackagesToUpdate));
-    handleClose();
-    // setData(storeData)
+  if (data) {
+    totalGisLength = data.reduce((a, v) => a + v.giS_Length, initialValue);
+    submittedInMoata = data
+      .filter((x) => x.status === "To Upload")
+      .reduce((a, v) => a + v.giS_Length, initialValue);
+    withCoder = data
+      .filter((x) => x.coder != null)
+      .reduce((a, v) => a + v.giS_Length, initialValue);
+  }
+
+
+
+  const customFilter = ({ filterName, value }) => {
+    setTimeout(() => {
+      dispatch(setFilteredWP({ filterName, filterValue: value }));
+    }, 1000);
   };
+
   return (
     <div className="container-fluid p-4">
-   <Spinner loadSpinner={toggleSpinner} />
-       <Errors message={errorMessage} show={error} />
-    
+      <Spinner loadSpinner={toggleSpinner} />
+      <Errors message={errorMessage} show={error} />
+
       <Success
-        message={"Workpackage Updates"}
+        message={"Workpackage Updated"}
         show={putWorkPackageSuccess}
         UpdateSuccessFlag={() => dispatch(updatePutSuccessFlag())}
       />
 
-<Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Update Attributes of Selected WP</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {/* <InputGroup className="mb-3" onChange={(event) => setCoder(event.target.value)}> */}
-        <Form.Label>Completion Status</Form.Label>
-          <Form.Select
-            aria-label="Default select example"
-            onChange={(event) => {
-             completeionStatusValue = event.target.value;
-          
-            }}
-          >
-            <option></option>
-            {completeionStatus[0].valueOptions.map((values) => (
-              
-              <option key={values}>{values}</option>
-            ))}
-          </Form.Select>
-       
-          <Form.Label>Completion Characterization</Form.Label>
-          <Form.Select
-            aria-label="Default select example"
-            onChange={(event) => {
-              completeionCharacterizationValue = event.target.value;
-           
-             }}
-          >
-            <option></option>
-            
-            {completeionCharacterization[0].valueOptions.map((value) => (
-              
-              <option key={value}>{value}</option>
-            ))}
-          </Form.Select>
-          <Form.Label>Characterization</Form.Label>
-          <Form.Select
-            aria-label="Default select example"
-            onChange={(event) => {
-              characterizationValue = event.target.value;
-           
-             }}
-          >
-            <option></option>
-            {characterization[0].valueOptions.map((value) => (
-              
-              <option key={value}>{value}</option>
-            ))}
-          </Form.Select>
+      <WpAdvancedSearch
+        show={advancedFilterShow}
+        HandleOnHide={() => setadvancedFilterShow(false)}
+      />
 
-        
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => updateSetStatus()}
-          >
-         Update
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
+    <WpMultiEdit show={show} handleClose={handleClose} data={data} rowIds={rowIds}/>
 
       <Spinner loadSpinner={toggleSpinner} />
-      <Errors
-        showHeading={false}
-        show={showError}
-        message={showErrorMessage}
-      />
-      <div className="d-flex flex-row">
-        
-      <div className="m-2">
-        <Form.Select style={{width:'200px', display:'inline'}}
-            aria-label="Default select example"
-            onChange={(event) => {
-              setSelectedOffice(event.target.value);
-          
+      <Errors showHeading={false} show={showError} message={showErrorMessage} />
+      <div className="d-flex flex-row mb-2">
+        <div style={{ zIndex: 998, width: "600px", marginRight: "30px" }}>
+          <div
+            className="row"
+            style={{
+              position: "relative",
+              // left: "100px",
+              backgroundColor: "white",
+              color: "black",
+              // width: "500px",
+              minHeightheight: "160px",
+              alignContent: "center",
+              padding: "20px 0px 20px auto",
             }}
           >
-           
-            {offices.map((office) => (
-              
-              <option key={office.id}>{office.name}</option>
-            ))}
-          </Form.Select>
-        </div>
-      
-      <div style={{ zIndex: 998, width: "700px" }}>
-      
-        <div
-          className="mb-4 d-flex"
-          style={{
-            position: "relative",
-            // left: "100px",
-            backgroundColor: "white",
-            color: "black",
-            // width: "500px",
-            minHeightheight: "160px",
-            alignContent: "center",
-            padding:'20px 20px 0px 20px',
-            borderRadius: "20px",
-            boxShadow: "10px 10px 15px grey",
-          }}
-        >
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker
-              label="From Date"
-              onChange={(value) =>
-                setFromDate(moment(value).format("YYYY-MM-DDTHH:mm:ss.ssss"))
-              }
-              maxDate={moment()}
-              className="p-1"
-              format="DD/MM/YYYY"
-            />
-            <DatePicker
-              label="To Date"
-              onChange={(value) =>
-                setToDate(moment(value).format("YYYY-MM-DDTHH:mm:ss.ssss"))
-              }
-              maxDate={moment()}
-              className="p-1"
-              format="DD/MM/YYYY"
-            />
-          </LocalizationProvider>
-          <Button
-            disabled={fromDate && toDate ? false : true}
-            data-tooltip-id="my-tooltip"
-            variant="success"
-            className="m-2"
-            data-tooltip-content="Refresh Data"
-            onClick={() => {
-              loadAllWorkPackages();
-            }}
-            style={{ height: "50px" }}
-          >
-            <FontAwesomeIcon icon={faMagnifyingGlass} />
-          </Button>
-          <Tooltip id="my-tooltip" style={{ zIndex: 999 }} />
+            <div>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DatePicker
+                  label="From Date"
+                  onChange={(value) =>
+                    setFromDate(
+                      moment(value).format("YYYY-MM-DDTHH:mm:ss.ssss")
+                    )
+                  }
+                  maxDate={moment()}
+                  className="p-1"
+                  format="DD/MM/YYYY"
+                  defaultValue={defaultFromDate}
+                />
+                <DatePicker
+                  label="To Date"
+                  onChange={(value) =>
+                    setToDate(
+                      moment(value)
+                        .add(24, "hours")
+                        .format("YYYY-MM-DDTHH:mm:ss.ssss")
+                    )
+                  }
+                  //  maxDate={defaultToDate}
+                  className="p-1"
+                  format="DD/MM/YYYY"
+                  defaultValue={defaultToDate}
+                />
+              </LocalizationProvider>
+              <Button
+                // disabled={fromDate && toDate ? false : true}
+                data-tooltip-id="my-tooltip"
+                variant="success"
+                className="m-2"
+                data-tooltip-content="Refresh Data"
+                onClick={() => {
+                  loadAllWorkPackages();
+                }}
+                style={{ height: "50px" }}
+              >
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </Button>
+              <Tooltip id="my-tooltip" style={{ zIndex: 999 }} />
+            </div>
 
-         
+            {
+              <div className="mb-2">
+                <TextField
+                  id="WP"
+                  name="WP"
+                  label="WP#"
+                  className="m-1"
+                  style={{ width: "100px" }}
+                  onChange={(e) => {
+                    customFilter({ filterName: "wp", value: e.target.value });
+                  }}
+                />
+                <TextField
+                  id="Operator"
+                  name="Operator"
+                  label="Operator#"
+                  className="m-1"
+                  style={{ width: "200px" }}
+                  onChange={(e) => {
+                    customFilter({
+                      filterName: "operator",
+                      value: e.target.value,
+                    });
+                  }}
+                />
+                <LocalizationProvider dateAdapter={AdapterMoment}>
+                  <DatePicker
+                    label="Inspection Date"
+                    onAccept={(value) => {
+                      customFilter({
+                        filterName: "inspDate",
+                        value: moment(value).format("YYYY-MM-DDTHH:mm:ss"),
+                      });
+                    }}
+                    onChange={(val) => {
+                   
+                      if (val === "" || val == null) {
+                        customFilter({ filterName: "inspDate", value: null });
+                      }
+                    }}
+                    maxDate={moment()}
+                    className="p-1"
+                    format="DD/MM/YYYY"
+                  />
+                </LocalizationProvider>
+              </div>
+            }
+          </div>
         </div>
-      </div>
-      <div className="d-flex flex-row">
-      <Cards title="GIS Meters" subtitle= {Math.round((totalGisLength + Number.EPSILON) * 100) / 100}  />
-          <Cards title="In Moata" subtitle= {submittedInMoata} />
-          <Cards title="With Coder" subtitle= {withCoder} />
-        {/* <Card className="reportCards">
+        <div className="d-flex flex-row mb-4">
+          <Cards
+            title="GIS Meters"
+            subtitle={Math.round((totalGisLength + Number.EPSILON) * 100) / 100}
+          />
+          <Cards title="In Moata" subtitle={submittedInMoata} />
+          <Cards title="With Coder" subtitle={withCoder} />
+          {/* <Card className="reportCards">
             <CardHeader>Quick Summary</CardHeader>
             <CardBody className="reportCardBody">{reports()}</CardBody>
           </Card> */}
+        </div>
       </div>
-          </div>
       <div style={{ position: "sticky", top: "600px" }}>
         <div>
-          {
-            rowIds.length > 0 && <Button
-            data-tooltip-id="my-tooltip"
-            variant="success"
-            className="m-2"
-            data-tooltip-content="Bulk Edit"
-            onClick={() => setShow(true)}
-          >
-            <FontAwesomeIcon
-              icon={faPenToSquare}
-              // onClick={() => updateReceivedFromCoder("Received from Coder")}
-            />
-          </Button>
-          }
-        
+          {rowIds.length > 0 && (
+            <Button
+              data-tooltip-id="my-tooltip"
+              variant="success"
+              className="m-2"
+              data-tooltip-content="Bulk Edit"
+              onClick={() => setShow(true)}
+            >
+              <FontAwesomeIcon
+                icon={faPenToSquare}
+                // onClick={() => updateReceivedFromCoder("Received from Coder")}
+              />
+            </Button>
+          )}
         </div>
         {data.length > 0 ? (
           <Table
@@ -441,16 +380,21 @@ export default function WorkPackage() {
             HandleRowUpdate={(value) => updateRowInStore(value)}
             HandleStatusChange={(data) => setRowIds(data)}
             colHeaders={columnHeaders}
+            // filters={filterPayload}
             // editTable={false}
             HandlePageFilters={(data) => {
               setPagedData(data);
+            }}
+            rowCss={(params) => {
+              return params.row.duplicateAndLatest === false
+                ? classes.red
+                : classes.black;
             }}
           />
         ) : (
           <>
             <h3>No Data</h3>
             <Box>
-              <Skeleton width={"100vh"} height={"100px"} />
               <Skeleton width={"100vh"} height={"100px"} />
               <Skeleton width={"100vh"} height={"100px"} />
               <Skeleton width={"100vh"} height={"100px"} />

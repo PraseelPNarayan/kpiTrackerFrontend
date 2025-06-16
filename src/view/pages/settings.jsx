@@ -12,6 +12,17 @@ import {
 import { Button } from "@mui/material";
 import { Tooltip } from "react-tooltip";
 import { Link,Routes,Route } from "react-router-dom";
+import Box from '@mui/material/Box';
+// import {Add} from '@mui/icons-material';
+// import {Edit} from '@mui/icons-material';
+
+import {
+  GridRowModes,
+  DataGrid,
+  GridToolbarContainer,
+  GridActionsCellItem,
+  GridRowEditStopReasons,
+} from '@mui/x-data-grid';
 
 import Apiservice from "../../js/api/apiService";
 import CodersForm from "../common/forms/codersForm";
@@ -61,6 +72,7 @@ export default function Settings({match}) {
           <Tab
             eventKey="coders"
             title="Coders"
+            className="p-3"
             // onSelect={() => dispatch(Apiservice.getAllCoders())}
           >
             <Link to={"/home/settings/addEditCoder"}
@@ -102,7 +114,7 @@ export default function Settings({match}) {
                               }}>
                           <FontAwesomeIcon
                             icon={faUserPen}
-                            size={"2x"}
+                            size={"1x"}
                             color="green"
                         
                           />
@@ -114,10 +126,10 @@ export default function Settings({match}) {
               </tbody>
             </Table>
           </Tab>
-          <Tab eventKey="staff" title="Staff">
+          <Tab eventKey="staff" title="Staff" className="p-3">
             <Staff />
           </Tab>
-          <Tab eventKey="office" title="Office">
+          <Tab eventKey="office" title="Office" className="p-3">
             <Office />
           </Tab>
         </Tabs>
