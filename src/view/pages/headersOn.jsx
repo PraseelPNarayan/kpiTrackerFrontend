@@ -1,38 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileImport,
-  faGlassMartini,
-  faPaperPlane,
   faRedoAlt,
   faUser,
   faUserPen,
 } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "react-tooltip";
 import Modal from "react-bootstrap/Modal";
-
-import EditableTable from "../common/editableTable";
+import { makeStyles } from "@mui/styles";
 import Table from "../common/table";
 
-import {
-  updatePutSuccessFlag,
-  selectApiStatus,
-} from "../../js/reducer/kpiTrackerSlice";
+import { updatePutSuccessFlag } from "../../js/reducer/kpiTrackerSlice";
 import ApiService from "../../js/api/apiService";
 import Success from "../common/success";
 import Errors from "../common/errors";
 import moment from "moment";
 import { Spinner } from "../common/spinner";
+import { useAuth } from "../../js/auth/authProvider";
+
+const useStyles = makeStyles({
+  red: {
+    color: "red",
+  },
+  black: {
+    color: "black",
+  },
+});
 
 export default function HeadersOn() {
+  const classes = useStyles();
+
   const data = useSelector((state) => state.kpiTracker.headersOn);
-  const status = useSelector((state) => state.kpiTracker.status);
   const coders = useSelector((state) => state.kpiTracker.coders);
+  const user = useAuth();
 
   // const [storeData,setData] = useState(data)
-  const [apiStatus, setApiStatus] = useState(status)
 
   const dispatch = useDispatch();
 
@@ -42,10 +47,9 @@ export default function HeadersOn() {
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
   const toggleSpinner = useSelector((state) => state.kpiTracker.toggleSpinner);
-
   const [show, setShow] = useState(false);
-  const [coder, setCoder] = useState();
-  const [dateSent, setDateSent] = useState();
+  const [coder, setCoder] = useState(null);
+
   const [rowIds, setRowIds] = useState([]);
   const [columnHeaders, setColumnHeaders] = useState([]);
 
@@ -53,11 +57,9 @@ export default function HeadersOn() {
   const handleShow = () => setShow(true);
 
   useEffect(() => {
- 
     loadTableHeaders();
-// setData(data)
+    // setData(data)
     // getAllHeadersOnData();
-    
   }, [data]);
 
   // const getAllHeadersOnData = () => {
@@ -66,6 +68,8 @@ export default function HeadersOn() {
   // };
 
   const updateRow = (data) => {
+    let newData = { ...data, office: user.userParsed.office };
+
     dispatch(ApiService.putHeadersOn(data));
   };
 
@@ -82,10 +86,10 @@ export default function HeadersOn() {
         send_for_coding: "Yes",
         status: status,
         date_Sent_for_coding: moment().format("YYYY-MM-DDTHH:mm:ss.ssss"),
+        office: user.userParsed.office,
       });
     });
 
- 
     dispatch(ApiService.putHeadersOnBatchEntries(headersOnToUpdate));
     handleClose();
     // setData(storeData)
@@ -105,7 +109,6 @@ export default function HeadersOn() {
       });
     });
 
-  
     dispatch(ApiService.putHeadersOnBatchEntries(headersOnToUpdate));
     handleClose();
     // setData(storeData)
@@ -121,7 +124,6 @@ export default function HeadersOn() {
       headersOnToUpdate.push({ ...copyHeaders[foundHeader], status: status });
     });
 
-  
     dispatch(ApiService.putHeadersOnBatchEntries(headersOnToUpdate));
     handleClose();
     // setData(storeData)
@@ -131,44 +133,55 @@ export default function HeadersOn() {
     let tempCol = [];
     let schema = {};
     if (data && data.length > 0)
-      ApiService.headersOnFields.map((columnHeader,i) => {
+      ApiService.headersOnFields.map((columnHeader, i) => {
         if (!columnHeaders.includes(columnHeader)) {
           schema = {
             field: columnHeader.key,
             headerName: columnHeader.label,
-            editable: columnHeader.key === "id" || 
-                      columnHeader.key ==="status" ||
-                      columnHeader.key === "asset_ID"
-                      ? false : true,
+            editable:
+              columnHeader.key === "id" ||
+              columnHeader.key === "status" ||
+              columnHeader.key === "asset_ID" ||
+              columnHeader.key === "duplicateAndLatest"
+                ? false
+                : true,
             type: columnHeader.type ? columnHeader.type : "text",
             valueOptions: columnHeader.valueOptions
               ? columnHeader.valueOptions
               : null,
-              // headerClassName: 'super-app-theme--header',
-              headerAlign: 'center',
+            // headerClassName: 'super-app-theme--header',
+            headerAlign: "center",
           };
-        
         }
         if (columnHeader.type && columnHeader.type === "date") {
           let dateParams = {
+            valueGetter: (value, row) => (row[i] ? new Date(row[i]) : null),
+          };
+          schema = { ...schema, ...dateParams };
+        }
+        if (columnHeader.type && columnHeader.type === "dateTime") {
+         
+          let dateParams = {
             valueGetter: (value, row) =>
-              row[i] ? new Date(row[i]) : null,
+              // console.log(value, row)
+              value ? new Date(value) : null,
+            //  console.log('found ',row.date_of_Inspection)
+            // row[i] ? moment(row.date_of_Inspection).format('yyyy-mm-dd hh:mm') : null,
           };
           schema = { ...schema, ...dateParams };
         }
         tempCol.push(schema);
       });
     setColumnHeaders(tempCol);
-
   };
 
   return (
-    <>
+    <div style={{ marginTop: "10px" }}>
       <Spinner loadSpinner={toggleSpinner} />
-       <Errors message={errorMessage} show={error} />
-    
+      <Errors message={errorMessage} show={error} />
+
       <Success
-        message={"Workpackage Updates"}
+        message={"Workpackage Updated"}
         show={putHeadersOnSuccess}
         UpdateSuccessFlag={() => dispatch(updatePutSuccessFlag())}
       />
@@ -182,14 +195,16 @@ export default function HeadersOn() {
             aria-label="Default select example"
             onChange={(event) => {
               setCoder(event.target.value);
-          
             }}
           >
-            <option>--Select--</option>
-            {coders.filter(x => x.status===true).map((coder) => (
-              
-              <option key={coder.id}>{coder.name}</option>
-            ))}
+            {coders
+              .filter((x) => x.status === true)
+              .map((coder) => (
+                <>
+                  <option></option>
+                  <option key={coder.id}>{coder.name}</option>
+                </>
+              ))}
           </Form.Select>
           {/* <Form.Control
           placeholder="Coders Name"
@@ -214,80 +229,104 @@ export default function HeadersOn() {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => updateSetStatus("With Coder")}
-          >
-            Confirm Send
-          </Button>
+          {coder && coder.length > 0 && (
+            <Button
+              variant="primary"
+              onClick={() => updateSetStatus("With Coder")}
+            >
+              Confirm Send
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
-  
-        <div className="pb-2" >
-          <Button
-            data-tooltip-id="my-tooltip"
-            variant="success"
-            className="m-2"
-            onClick={() => {
-              dispatch(ApiService.getAllCoders());
-              handleShow();
+
+      <div className="pb-2">
+        {/* <Form.Select style={{width:'200px', display:'inline'}}
+            aria-label="Default select example"
+            onChange={(event) => {
+              setSelectedOffice(event.target.value);
+          
             }}
-            data-tooltip-content="Send to Coder"
           >
-            <FontAwesomeIcon icon={faUser} />
-          </Button>
+           
+            {offices.map((office) => (
+              
+              <option key={office.id}>{office.name}</option>
+            ))}
+          </Form.Select> */}
+        <Button
+          data-tooltip-id="my-tooltip"
+          variant="success"
+          className="m-2"
+          onClick={() => {
+            dispatch(ApiService.getAllCoders());
+            handleShow();
+          }}
+          data-tooltip-content="Send to Coder"
+          disabled={rowIds.length ? false : true}
+        >
+          <FontAwesomeIcon icon={faUser} />
+        </Button>
 
-          <Button
-            data-tooltip-id="my-tooltip"
-            variant="success"
-            className="m-2"
-            data-tooltip-content="Received from Coder"
-          >
-            <FontAwesomeIcon
-              icon={faUserPen}
-              onClick={() => updateReceivedFromCoder("Received from Coder")}
-            />
-          </Button>
+        <Button
+          data-tooltip-id="my-tooltip"
+          variant="success"
+          className="m-2"
+          data-tooltip-content="Received from Coder"
+          disabled={rowIds.length ? false : true}
+        >
+          <FontAwesomeIcon
+            icon={faUserPen}
+            onClick={() => updateReceivedFromCoder("Received from Coder")}
+          />
+        </Button>
 
-          <Button
-            data-tooltip-id="my-tooltip"
-            variant="success"
-            className="m-2"
-            data-tooltip-content="To Upload"
-          >
-            <FontAwesomeIcon
-              icon={faFileImport}
-              onClick={() => updateReadyToUpload("To Upload")}
-            />
-          </Button>
-          <Button
-            data-tooltip-id="my-tooltip"
-            variant="danger"
-            className="m-2"
-            data-tooltip-content="Refresh Data"
-          >
-            <FontAwesomeIcon
-              icon={faRedoAlt}
-              onClick={() => dispatch(ApiService.getAllHeadersOn())}
-            />
-          </Button>
-          <Tooltip id="my-tooltip" style={{ zIndex: 999 }} />
-        </div>
-        <div className="w-100">
-          {data && data.length > 0 ? (
-            <Table
-              colHeaders={columnHeaders}
-              tableData={data}
-              HandleRowUpdate={(data) => updateRow(data)}
-              HandleStatusChange={(data) => setRowIds(data)}
-              editTable
-              HandlePageFilters={() => {}}
-            />
-          ) : (
-            <h3>No data</h3>
-          )}
-        </div>
-
-    </>
+        <Button
+          data-tooltip-id="my-tooltip"
+          variant="success"
+          className="m-2"
+          data-tooltip-content="To Upload"
+          disabled={rowIds.length ? false : true}
+        >
+          <FontAwesomeIcon
+            icon={faFileImport}
+            onClick={() => updateReadyToUpload("To Upload")}
+          />
+        </Button>
+        <Button
+          data-tooltip-id="my-tooltip"
+          variant="danger"
+          className="m-2"
+          data-tooltip-content="Refresh Data"
+        >
+          <FontAwesomeIcon
+            icon={faRedoAlt}
+            onClick={() => dispatch(ApiService.getAllHeadersOn())}
+          />
+        </Button>
+        <Tooltip id="my-tooltip" style={{ zIndex: 999 }} />
+      </div>
+      <div className="w-100">
+        {data && data.length > 0 ? (
+          <Table
+            colHeaders={columnHeaders}
+            tableData={data}
+            HandleRowUpdate={(data) => updateRow(data)}
+            HandleStatusChange={(data) => {
+              setRowIds(data);
+            }}
+            editTable
+            HandlePageFilters={() => {}}
+            rowCss={(params) => {
+              return params.row.duplicateAndLatest === false
+                ? classes.red
+                : classes.black;
+            }}
+          />
+        ) : (
+          <h3>No data</h3>
+        )}
+      </div>
+    </div>
   );
 }

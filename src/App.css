@@ -44,7 +44,7 @@
   --dark: rgb(33, 37, 41);
 }
 body {
-  /* background-color: rgb(248, 238, 223) !important; */
+  background-color: rgb(245, 243, 241) !important;
   font-family: "slabo-13px-regular";
   font-weight: 400;
   font-style: normal;
@@ -156,16 +156,28 @@ a {
  max-width: 200px;
 }
 
-#navBar:hover .navText {
-  display: block;
-  color: var(--color1);
-  font-weight: 500;
-  transition: display 1s ease-out;
-}
+/* .navText {
+  display: none;
+} */
 
 .navText {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+  color: var(--color1);
+  font-weight: 500;
 }
+#navBar:hover .navText {
+  opacity: 1;
+  visibility: visible;
+  /* display: block;
+  color: var(--color1);
+  font-weight: 500;
+  /* transition: display -1s ease-out;  
+  opacity: 1;
+  transition: opacity 1s ease-out; */
+}
+
 
 .expand:hover {
   background-color: #7bc143;
@@ -223,25 +235,6 @@ a {
   font-weight: 500;
 }
 
-/* .expand:hover {
-
-  background-color: #7bc143;
-  transition: all 0.5s ease-in-out;
-  width: 100%;
-  svg {
-    color: var(--dark);
- 
-  }
-  .navText {
-    display: block;
-    color: var(--dark);
-  }
-} */
-
-/* .expand:hover + nav{
-  width: 300px;
-} */
-
 .activeLink {
   display: flex;
   justify-content: start;
@@ -292,6 +285,44 @@ a {
       color: var(--dark) !important;
     }
   
+}
+
+.customCard{
+  width: 230px;
+  height: 100px;
+  /* border: 2px solid #dee2e6; */
+  border-radius: 10px;
+ background-color: white;
+  /* text-align: center; */
+  display: flex;
+  flex-direction: row;
+  padding-right: 20px;
+  padding-left: 20px;
+  justify-content: space-between;
+  margin-right: 10px;
+
+}
+.cardTitle{
+  color: #236a7e !important;
+  /* padding-left: 10px; */
+  margin-top: 10px !important;
+}
+
+.cardSubTitle{
+  color: #282c34 !important;
+margin-top: 0px !important;
+
+}
+
+.cardVector{
+  height:120%;
+   width: 50px;
+    background-color:rgb(30, 0, 138);
+    display: flex;
+     justify-Content:center;
+     align-items: center;
+      margin-Right: 20px;
+      border-radius: 5px;
 }
 
 .applyHoverEffectOnAccount:hover > .accountSettingsOptions {

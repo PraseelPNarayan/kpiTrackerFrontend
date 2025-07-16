@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import validator from "validator";
 import {
   addInitialWorkPackage,
+  updateNotUploaded,
   updateSuccessFlag,
 } from "../../js/reducer/kpiTrackerSlice";
 import { Card, Button, Container, Row, Col, ToastBody } from "react-bootstrap";
@@ -27,18 +28,12 @@ export default function ImportData() {
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
   const success = useSelector((state) => state.kpiTracker.success);
-
+  const staff = useSelector((state) => state.kpiTracker.loggedInStaff);
+ 
   const SetImportedData = (data) => {
+     dispatch(updateNotUploaded());
     if (actionType === ActionType.createWorkPage) {
-
-      let formattedData = [...data];
-      formattedData.forEach((m) => {
-        m.Abandoned_M =m.Abandoned_M ?validator.trim(m.Abandoned_M)   : 0.00
-        m.Surveyed_M = validator.trim(m.Surveyed_M? m.Surveyed_M : "0")
-        m.GIS_Length = validator.trim(m.GIS_Length? m.GIS_Length : "0")
-      });
-
-      dispatch(ApiService.postCreateWorkpackages(formattedData));
+      dispatch(ApiService.postCreateWorkpackages(data));
     }
 
     if (actionType === ActionType.createHeadersOn) {
@@ -48,9 +43,10 @@ export default function ImportData() {
         m.Date_of_Inspection = moment(dateOfInsp, "DD/MM/YYYY").format(
           "YYYY-MM-DD"
         );
-        m.Abandoned_M =m.Abandoned_M ?validator.trim(m.Abandoned_M)   : 0.00
-        m.Surveyed_M = validator.trim(m.Surveyed_M? m.Surveyed_M : "0")
-        m.GIS_Length = validator.trim(m.GIS_Length? m.GIS_Length : "0")
+        m.Abandoned_M = m.Abandoned_M ? validator.trim(m.Abandoned_M) : 0.0;
+        m.Surveyed_M = validator.trim(m.Surveyed_M ? m.Surveyed_M : "0");
+        m.GIS_Length = validator.trim(m.GIS_Length ? m.GIS_Length : "0");
+        m.createdby = staff.id;
       });
       dispatch(ApiService.postCreateHeadersOn(formattedData));
     }
@@ -59,13 +55,17 @@ export default function ImportData() {
       let formattedData = [...data];
       formattedData.forEach((m) => {
         let dateOfInsp = m.Date_of_Inspection + "00:00:00";
-        m.Date_of_Inspection = moment(dateOfInsp, "DD/MM/YYYY").format("YYYY-MM-DD");
-        m.Time_of_Inspection =m.Time_of_Inspection  ? moment(m.Time_of_Inspection,'HH:MM:SS').format('hh:mma') : '00:00am'
-        m.Abandoned_M =m.Abandoned_M ? validator.trim(m.Abandoned_M)   : 0.00
-        m.Surveyed_M = validator.trim(m.Surveyed_M? m.Surveyed_M : "0")
-        m.GIS_Length = validator.trim(m.GIS_Length? m.GIS_Length : "0")
+        m.Date_of_Inspection = moment(dateOfInsp, "DD/MM/YYYY").format(
+          "YYYY-MM-DD"
+        );
+        m.Time_of_Inspection = m.Time_of_Inspection
+          ? moment(m.Time_of_Inspection, "HH:MM:SS").format("hh:mma")
+          : "00:00am";
+        m.Abandoned_M = m.Abandoned_M ? validator.trim(m.Abandoned_M) : 0.0;
+        // m.Surveyed_M = validator.trim(m.Surveyed_M ? m.Surveyed_M : "0");
+        // m.GIS_Length = validator.trim(m.GIS_Length ? m.GIS_Length : "0");
       });
-     dispatch(ApiService.putHeadersOnBatch(data));
+      dispatch(ApiService.putHeadersOnBatch(data));
     }
   };
 
@@ -74,10 +74,10 @@ export default function ImportData() {
       setFieldsType(ApiService.initialWorkPackageFields);
     }
 
-    if (type == ActionType.createHeadersOn) {
+    if (type === ActionType.createHeadersOn) {
       setFieldsType(ApiService.dailyReportFields);
     }
-    if (type == ActionType.updateBatchHeadersOn) {
+    if (type === ActionType.updateBatchHeadersOn) {
       setFieldsType(ApiService.dailyReportFields);
     }
     setOpenImporter(true);
@@ -91,6 +91,7 @@ export default function ImportData() {
         message={"Data load completed"}
         show={success}
         UpdateSuccessFlag={() => dispatch(updateSuccessFlag())}
+       
       />
 
       <Container className="w-100 h-100">
@@ -136,10 +137,9 @@ export default function ImportData() {
               </Card.Body>
             </Card>
           </Col>
-         
         </Row>
         <Row>
-        <Col md="12" className="pt-4">
+          <Col md="12" className="pt-4">
             <Card style={{ width: "18rem", height: "20rem" }}>
               <Card.Body>
                 <Card.Title>Update HeaderOn</Card.Title>
@@ -177,6 +177,7 @@ export default function ImportData() {
           isImportOpen={openImporter}
           SetData={(data) => {
             SetImportedData(data);
+    
           }}
           CloseImporter={() => {
             setOpenImporter(false);

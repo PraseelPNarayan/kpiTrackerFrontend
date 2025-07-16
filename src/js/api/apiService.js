@@ -2,12 +2,12 @@
 import axios from "axios";
 import Types from "../actions/actionType";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import moment from "moment";
-import { useSelector } from "react-redux";
-import { selectApiStatus } from "../reducer/kpiTrackerSlice";
 
 
-export const baseUrl= "https://localhost:7192/api"
+//  export const baseUrl= "http://localhost:5278/api"
+// export const baseUrl= "http://172.16.1.12:5000/api"
+// export const baseUrl= process.env.REACT_APP_KPITRACKERAPI
+ export const baseUrl= "http://172.16.1.12:5040/api"
 
 const getAllHeadersOn=createAsyncThunk(Types.fetchAllHeadersOn, async ()=>{
  
@@ -44,7 +44,7 @@ const postCreateHeadersOn=createAsyncThunk(Types.createHeadersOn, async (payload
 
  const putHeadersOnBatch=createAsyncThunk(Types.updateBatchHeadersOn, async (payload)=>{
   const response =await  axios.put(baseUrl+'/headerson/putheadersonbatch',payload)
-   return response.data;
+    return response.data;
  
  }
  )
@@ -76,8 +76,8 @@ const postCreateHeadersOn=createAsyncThunk(Types.createHeadersOn, async (payload
   }
   )
  
-  const putWorkpackagesBatch=createAsyncThunk(Types.updateBatchHeadersOn, async (payload)=>{
-   const response =await  axios.put(baseUrl+'/workpackages/putbatchworkpackages',payload)
+  const putWorkpackagesBatch=createAsyncThunk(Types.updateWorkPackages, async (payload)=>{
+   const response =await  axios.put(baseUrl+'/workpackages/putBatchWorkpackages',payload)
     return response.data;
   
   }
@@ -121,6 +121,21 @@ const postCreateHeadersOn=createAsyncThunk(Types.createHeadersOn, async (payload
  })
 
 
+ const createOffice=createAsyncThunk(Types.createOffice, async (payload)=>{
+  const response = await axios.post(baseUrl+'/office/createoffice',payload)
+ return response.data
+ })
+
+ const updateOffice=createAsyncThunk(Types.updateOffice, async (payload)=>{
+  const response = await axios.put(baseUrl+'/office/updateOffice',payload)
+ return response.data
+ })
+
+ const getAllOffices=createAsyncThunk(Types.getAllOffices, async ()=>{
+  const response = await axios.get(baseUrl+'/office/getOfficelist')
+ return response.data
+})
+
 
 
 const initialWorkPackageFields = [
@@ -152,15 +167,16 @@ const initialWorkPackageFields = [
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-        { label: "Yes", value: "Yes" },
-        { label: "Yes and Added", value: "Yes and Added" },
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
     type:"singleSelect",
-    valueOptions: ['Yes','Added', 'Yes and Added'],
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
 
-    example: "Added",
+    example: "Contracted",
   },
   {
     label: "Asset ID",
@@ -232,24 +248,21 @@ const initialWorkPackageFields = [
 
 const workPackageFields = [
   {
+    label: "Duplicate and Latest",
+    key: "duplicateAndLatest",
+    fieldType: { type: "input" },
+    editable : false
+  },
+  {
     label: "Id",
     key: "id",
 
     fieldType: {
       type: "input",
     },
-
+    editable : false
   },
-  {
-    label: "Status",
-    key: "status",
-
-    fieldType: {
-      type: "input",
-    },
-
-  },
-  {
+   {
     label: "WP",
     key: "wp",
 
@@ -267,26 +280,27 @@ const workPackageFields = [
         level: "error",
       },
     ],
+    editable : false
   },
   {
     label: "Urgent",
 
-    key: "urgent",
+    key: "Urgent",
 
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-
-        { label: "Yes", value: "Yes" },
-        { label: "Add", value: "Add" },     
-           { label: "Yes and Added", value: "Yes and Added" }
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
+    type:"singleSelect",
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
 
-    example: "Added",
-    type:'singleSelect',
-    valueOptions:['Yes', 'Added', 'Yes and Added']
+    example: "Contracted",
+    editable: false
   },
   {
     label: "Asset ID",
@@ -306,6 +320,7 @@ const workPackageFields = [
         level: "error",
       },
     ],
+    editable : false
   },
   {
     label: "GIS Length",
@@ -317,6 +332,7 @@ const workPackageFields = [
     },
 
     example: "33.33",
+    editable : false
   },
   {
     label: "Surveyed m",
@@ -328,6 +344,7 @@ const workPackageFields = [
     },
 
     example: "20.03",
+    editable : false
   },
   {
     label: "Abandoned m",
@@ -339,6 +356,7 @@ const workPackageFields = [
     },
 
     example: "23.33",
+    editable : false
   },
   {
     label: "Diameter",
@@ -350,6 +368,7 @@ const workPackageFields = [
     },
 
     example: "100",
+    editable : false
   },
   {
     label: "Address",
@@ -361,6 +380,7 @@ const workPackageFields = [
     },
 
     example: "21 Foxlaw Street Randwick Park",
+    editable : false
   },
   {
     label: "Map No.",
@@ -379,18 +399,23 @@ const workPackageFields = [
     key: "received_Date",
 
     fieldType: {
-      type: "date",
+      type: "datetime",
     },
 
     example: "yyyy-mm-dd",
-    // type:'date'
+    editable : false,
+    type:'datetime'
   },
   {
     label: "Inspection Date",
     key: "inspection_Date",
-    fieldType: { type: "date" },
-     example: "yyyy-mm-dd",
- 
+  
+    
+     editable : false,
+    
+     fieldType: { type: "dateTime" },
+     example: "dd-mm-yyyy",
+     type:'dateTime'
   },
   {
     label: "Rego",
@@ -403,18 +428,21 @@ const workPackageFields = [
     key: "operator",
     fieldType: { type: "input" },
     example: "Bach Bendle",
+    editable : false
   },
   {
     label: "Coder",
     key: "coder",
     fieldType: { type: "input" },
     example: "Te Rewa Price",
+    editable : false
   },
   {
     label: "Sent for Coding",
     key: 'sent_for_Coding',
     fieldType: { type: "input" },
     example: "44835",
+    editable : false
   },
   {
     label: "Coding Received",
@@ -422,51 +450,120 @@ const workPackageFields = [
     fieldType: { type: "date" },
     example: "44838",
         // type:'date',
-   
+        editable : false,
+        type:'date'
      
   },
   {
     label: "Completion Status",
     key: "completion_Status",
-    fieldType: { type: "input" },
+    fieldType: {
+      type: "select",
+      options: [
+        { label: "Completed Asset", value: "Completed Asset" },
+
+        { label: "Remaining Possible Inspectable Assets", value: "Remaining Possible Inspectable Assets" },
+        { label: "Asset Unable to Complete", value: "Asset Unable to Complete" }
+      ],
+    },
     example: "Completed Asset",
+    type:'singleSelect',
+    valueOptions:['Completed Asset', 'Remaining Possible Inspectable Assets', 'Asset Unable to Complete']
   },
   {
     label: "Completion Characterization",
     key: "completion_Characterization",
-    fieldType: { type: "input" },
+    fieldType: { type: "select",
+      options:[
+        { label: "HC", value: "HC" },	  { label: "TM", value: "TM" },	  { label: "3RD", value: "3RD" },	  { label: "P", value: "P" },	  { label: "NS", value: "NS" },	  { label: "LD", value: "LD" },	  { label: "RF", value: "RF" },	  { label: "HWP", value: "HWP" },	  { label: "HWO", value: "HWO" },	  { label: "AI", value: "AI" },	  { label: "AB", value: "AB" },	  { label: "KR", value: "KR" },	  { label: "LDNE", value: "LDNE" },	  { label: "TD", value: "TD" },
+
+      ]
+     },
     example: "",
+    type:'singleSelect',
+    valueOptions:["HC",
+      "TM",
+      "3RD",
+      "P",
+      "NS",
+      "LD",
+      "RF",
+      "HWP",
+      "HWO",
+      "AI",
+      "AB",
+      "KR",
+      "LDNE",
+      "TD",
+      ]
   },
   {
     label: "Characterization",
     key: "characterization",
-    fieldType: { type: "input" },
+    fieldType: { type: "select",
+      options:[
+        { label: "RC", value: "RC" },	  { label: "DB", value: "DB" },	  { label: "L1", value: "L1" },	  { label: "L2", value: "L2" },	  { label: "L3", value: "L3" },	  { label: "CSE", value: "CSE" },	  { label: "RA", value: "RA" },	  { label: "L", value: "L" },	  { label: "S", value: "S" },	  { label: "3RD-CSE", value: "3RD-CSE" },	  { label: "HC-RC", value: "HC-RC" },	  { label: "HC-DB", value: "HC-DB" },	  { label: "P-L", value: "P-L" },	  { label: "P-S", value: "P-S" },
+
+      ]
+     },
     example: "",
+    type:'singleSelect',
+    valueOptions:["RC",
+      "DB",
+      "L1",
+      "L2",
+      "L3",
+      "CSE",
+      "RA",
+      "L",
+      "S",
+      "3RD-CSE",
+      "HC-RC",
+      "HC-DB",
+      "P-L",
+      "P-S",
+      ]
   },
-  { label: "IC/UI", key: "iC_UI", fieldType: { type: "input" }, example: "IC" },
+  { label: "IC/UI", key: "iC_UI", fieldType: { type: "input" }, example: "IC" , editable : false},
   { label: "DVD#", key: "DVD", fieldType: { type: "input" }, example: "" },
   {
     label: "Night Shift",
     key: "night_Shift",
     fieldType: { type: "input" },
     example: "NO",
+    editable : false
   },
   {
     label: "As-built Required?",
     key: "as_built_Required",
-    fieldType: { type: "input" },
+    fieldType: {
+      type: "select",
+      options: [
+        { label: "Required", value: "Required" },
+      ],
+    },
     example: "",
   },
   {
     label: "As-built Already Done?",
     key: "as_built_Already_Done",
-    fieldType: { type: "input" },
+    fieldType: {
+      type: "select",
+      options: [
+        { label: "Done", value: "Done" },
+      ],
+    },
     example: "",
   },
   {
     label: "As-Built File Name",
     key: "as_Built_File_Name",
-    fieldType: { type: "input" },
+    fieldType: {
+      type: "select",
+      options: [
+        { label: "Done", value: "Done" },
+      ],
+    },
     example: "",
   },
   {
@@ -474,7 +571,8 @@ const workPackageFields = [
     key: "uploaded_Date",
     fieldType: { type: "input" },
     example: "",
-        type:'date'
+        type:'date',
+        editable: false
   },
   {
     label: "Cleaning Type",
@@ -507,17 +605,18 @@ const workPackageFields = [
     key: "batch_No",
     fieldType: { type: "input" },
     example: "AT Culverts - Batch #0001",
+    editable :  false
   },
   {
     label: "Batch Date",
     key: "batch_Date",
-    fieldType: { type: "input" },
-    example: "44840",
-        type:'date'
+     fieldType: { type: "dateTime" },
+     example: "dd-mm-yyyy",
+     type:'dateTime'
   },
   {
-    label: "if Re-batched, old Batch ID#",
-    key: "old_Batch_No",
+    label: "WINCAN_PROJECT_ID_#",
+    key: "wincan_project_id",
     fieldType: { type: "input" },
     example: "",
   },
@@ -532,25 +631,30 @@ const workPackageFields = [
     key: "general_Comments_Field_App",
     fieldType: { type: "input" },
     example: "",
+    flex:1,
+    minWidth:500
   },
   {
     label: "General Comments ( From MOATA )",
     key: "general_Comments_Moata",
     fieldType: { type: "input" },
     example: "U/S Inlet, D/S Outlet no depths",
+    flex:1,
+    minWidth:500
   },
-  {
-    label: "Time of Inspection",
-    key: "time_of_Inspection",
-    fieldType: { type: "input" },
-    example: "0.595138888888889",
-  },
+  // {
+  //   label: "Time of Inspection",
+  //   key: "time_of_Inspection",
+  //   fieldType: { type: "input" },
+  //   example: "0.595138888888889",
+  // },
   {
     label: "Submitted Twice?",
     key: "submitted_Twice",
     fieldType: { type: "input" },
     example: "",
   },
+
 ];
 
 const dailyReportFields = [
@@ -582,13 +686,16 @@ const dailyReportFields = [
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-        { label: "Yes", value: "Yes" },
-        { label: "Yes and Added", value: "Yes and Added" },
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
+    type:"singleSelect",
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
 
-    example: "Added",
+    example: "Contracted",
   },
   {
     label: "Asset_ID",
@@ -761,12 +868,13 @@ const dailyReportFields = [
     key: "Date_of_Inspection",
     fieldType: { type: "input" },
     example: "21 Foxlaw Street Randwick Park",
+   
   },
   {
     label: "Time_of_Inspection",
     key: "Time_of_Inspection",
     fieldType: { type: "input" },
-    example: "21 Foxlaw Street Randwick Park",
+    example: "15:12:20 ",
   },
   {
     label: "Operator",
@@ -949,10 +1057,10 @@ const dailyReportFields = [
 
 const headersOnFields = [
   {
-    label: "status",
-    key: "status",
+    label: "Duplicate and Latest",
+    key: "duplicateAndLatest",
     fieldType: { type: "input" },
-    example: "",
+    editable : false
   },
   {
     label: "id",
@@ -963,19 +1071,21 @@ const headersOnFields = [
   {
     label: "Urgent",
 
-    key: "urgent",
+    key: "Urgent",
 
     fieldType: {
       type: "select",
       options: [
+        { label: "Contracted", value: "Contracted" },
         { label: "Added", value: "Added" },
-        { label: "Yes", value: "Yes" },
-        { label: "Yes and Added", value: "Yes and Added" },
+        { label: "Urgent", value: "Urgent" },
+        { label: "Urgent and Added", value: "Urgent and Added" },
       ],
     },
     type:"singleSelect",
-    valueOptions: ['Yes','Added', 'Yes and Added'],
-    example: "Added",
+    valueOptions: ['Contracted','Urgent', 'Urgent and Added'],
+
+    example: "Contracted",
   },
   {
     label: "Batch_ID",
@@ -1040,22 +1150,22 @@ const headersOnFields = [
   {
     label: "Date_of_Inspection",
     key: "date_of_Inspection",
-    fieldType: { type: "date" },
+    fieldType: { type: "dateTime" },
     example: "dd-mm-yyyy",
-    type:'date'
+    type:'dateTime'
   },
   {
-    label: "Date Receieved from Coder",
+    label: "Date Received from Coder",
     key: "date_Received_From_Coder",
     fieldType: { type: "input" },
     example: "dd-mm-yyyy",
-     type:'date'
+     type:'dateTime'
   },
   {
     label: "Time_of_Inspection",
-    key: "time_of_Inspection",
+    key: "Time_of_Inspection",
     fieldType: { type: "input" },
-    example: "0.661111111111111",
+  
   },
   {
     label: "Name_of_Operator",
@@ -1272,10 +1382,14 @@ export default {
   getAllCoders,
   getAllWorkpackages,
   postCreateWorkpackages,
+  putWorkpackagesBatch,
   createCoder,
   updateCoder,
   getAllUsers,
   updateUser,
-  createUser
+  createUser,
+  createOffice,
+  updateOffice,
+  getAllOffices
 
 };

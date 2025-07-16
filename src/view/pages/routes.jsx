@@ -15,12 +15,14 @@ import ProtectedRoutes from './protectedRoutes';
 import { useAuth } from '../../js/auth/authProvider';
 import Unauthorized from './unAuthorised';
 import Roles from '../../js/auth/roles';
+import OfficeForm from '../common/forms/officeForm';
 
 const Routes =()=>{
     const routes = createBrowserRouter([
         {
           path: "/home",
           element: <ProtectedRoutes element={ <NavBar />}  roles={Roles.AccessAll} /> ,
+          
            errorElement: <NotFound />,
           children: [
                  { index : true,
@@ -41,10 +43,11 @@ const Routes =()=>{
             },
             { path: "/home/settings/addEditCoder", element: <CodersForm /> },
             { path: "/home/settings/addEditUser", element: <UsersForm /> },
+            { path: "/home/settings/addEditOffice", element: <OfficeForm/> },
           ],
         },
-        { path: "/login", element: <Login /> },
-        { path: "*", element: <NotFound /> },
+        { path: "/login", element: <Login />, index: true },
+        { path: "*", element: <Login /> },
       ]);
 return <RouterProvider router={routes}/>
 }

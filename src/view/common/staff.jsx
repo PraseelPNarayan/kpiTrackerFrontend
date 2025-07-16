@@ -71,6 +71,7 @@ export default function Staff() {
                     <th>#</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Office</th>
                     <th>Active</th>
                     <th></th>
                   </tr>
@@ -82,6 +83,7 @@ export default function Staff() {
                         <td>{user.id}</td>
                         <td>{user.name}</td>
                         <td>{user.email}</td>
+                        <td>{user.office.name}</td>
                         <td>{user.isActive.toString()}</td>
                         <td>
                           <Link to={`/home/settings/addEditUser`} onClick={() => { 
