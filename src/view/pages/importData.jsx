@@ -33,35 +33,7 @@ export default function ImportData() {
   const SetImportedData = (data) => {
      dispatch(updateNotUploaded());
     if (actionType === ActionType.createWorkPage) {
-    //   let filtereddata = data.filter((item) => {
-    //     const val = item.Diameter?.toString().trim();
-    //     // Only allow valid floats (no words, empty, or non-numeric)
-    //     return val !== "" && /^-?\d+(\.\d+)?$/.test(val);
-    //   });
-    //   filtereddata = filtereddata.filter((item) => {
-    //     const val = item.GIS_Length?.toString().trim();
-    //     return val !== "" && /^-?\d+(\.\d+)?$/.test(val);
-    //   });
-
-
-    //   //  notUploaded.push(data.filter((item) => isNaN(parseFloat(item.Diameter)) === true));
-    //   //   notUploaded.push(data.filter((item) => isNaN(parseFloat(item.GIS_Length)) === true));
-    //   // console.log("notUploaded", notUploaded);
-    //  let notUploaded =  data
-    //     .filter((item) =>  (item.Diameter !== undefined && item.Diameter !== null && isNaN(parseFloat(item.Diameter))) || ( item.GIS_Length !== undefined && item.GIS_Length !== null && isNaN(parseFloat(item.GIS_Length)))
-    //   );
-
-      let formattedData = [...data];
-      formattedData.forEach((m) => {
-        m.Abandoned_M = m.Abandoned_M ? validator.trim(m.Abandoned_M) : 0.0;
-        m.Surveyed_M = validator.trim(m.Surveyed_M ? m.Surveyed_M : "0");
-        m.GIS_Length = validator.trim(m.GIS_Length ? m.GIS_Length : "0");
-        m.createdby = staff.id;
-        m.Diameter = m.Diameter === null ? 0 : m.Diameter;
-      });
-
-      dispatch(ApiService.postCreateWorkpackages(formattedData));
-      // dispatch(updateNotUploaded(notUploaded));
+      dispatch(ApiService.postCreateWorkpackages(data));
     }
 
     if (actionType === ActionType.createHeadersOn) {
@@ -205,7 +177,7 @@ export default function ImportData() {
           isImportOpen={openImporter}
           SetData={(data) => {
             SetImportedData(data);
-            console.log("data", data);
+    
           }}
           CloseImporter={() => {
             setOpenImporter(false);

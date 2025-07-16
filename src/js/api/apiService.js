@@ -4,10 +4,10 @@ import Types from "../actions/actionType";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 
-export const baseUrl= "http://localhost:5278/api"
+//  export const baseUrl= "http://localhost:5278/api"
 // export const baseUrl= "http://172.16.1.12:5000/api"
 // export const baseUrl= process.env.REACT_APP_KPITRACKERAPI
-// export const baseUrl= "http://172.16.1.12:5040/api"
+ export const baseUrl= "http://172.16.1.12:5040/api"
 
 const getAllHeadersOn=createAsyncThunk(Types.fetchAllHeadersOn, async ()=>{
  
@@ -44,7 +44,7 @@ const postCreateHeadersOn=createAsyncThunk(Types.createHeadersOn, async (payload
 
  const putHeadersOnBatch=createAsyncThunk(Types.updateBatchHeadersOn, async (payload)=>{
   const response =await  axios.put(baseUrl+'/headerson/putheadersonbatch',payload)
-   return response.data;
+    return response.data;
  
  }
  )
@@ -870,12 +870,12 @@ const dailyReportFields = [
     example: "21 Foxlaw Street Randwick Park",
    
   },
-  // {
-  //   label: "Time_of_Inspection",
-  //   key: "Time_of_Inspection",
-  //   fieldType: { type: "input" },
-  //   example: "21 Foxlaw Street Randwick Park",
-  // },
+  {
+    label: "Time_of_Inspection",
+    key: "Time_of_Inspection",
+    fieldType: { type: "input" },
+    example: "15:12:20 ",
+  },
   {
     label: "Operator",
     key: "Operator",
@@ -1161,12 +1161,12 @@ const headersOnFields = [
     example: "dd-mm-yyyy",
      type:'dateTime'
   },
-  // {
-  //   label: "Time_of_Inspection",
-  //   key: "time_of_Inspection",
-  //   fieldType: { type: "input" },
-  //   example: "0.661111111111111",
-  // },
+  {
+    label: "Time_of_Inspection",
+    key: "Time_of_Inspection",
+    fieldType: { type: "input" },
+  
+  },
   {
     label: "Name_of_Operator",
     key: "operator",

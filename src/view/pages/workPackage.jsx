@@ -61,19 +61,14 @@ const useStyles = makeStyles({
 });
 
 export default function WorkPackage() {
-  let filterPayload = { wp: "", operator: "", inspDate: "" };
-
   const classes = useStyles();
-
-  const data = useSelector((state) => state.kpiTracker.workPackage);
+  const data = useSelector((state) => state.kpiTracker.filteredWorkpackage);
   const status = useSelector((state) => state.kpiTracker.status);
   const toggleSpinner = useSelector((state) => state.kpiTracker.toggleSpinner);
   const error = useSelector((state) => state.kpiTracker.error);
   const errorMessage = useSelector((state) => state.kpiTracker.errorMessage);
-  const offices = useSelector((state) => state.kpiTracker.officeList);
   const defaultFromDate = useSelector((state) => state.kpiTracker.fromDate);
   const defaultToDate = useSelector((state) => state.kpiTracker.toDate);
-  const dateSet = useSelector((state) => state.kpiTracker.filterInspDate);
 
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [apiStatusChanged, setApiStatusChanged] = useState(status);
@@ -304,6 +299,7 @@ export default function WorkPackage() {
                   className="m-1"
                   style={{ width: "100px" }}
                   onChange={(e) => {
+                  
                     customFilter({ filterName: "wp", value: e.target.value });
                   }}
                 />
@@ -359,7 +355,7 @@ export default function WorkPackage() {
       </div>
       <div style={{ position: "sticky", top: "600px" }}>
         <div>
-          {rowIds.length > 0 && (
+          {data && rowIds?.length > 0 && (
             <Button
               data-tooltip-id="my-tooltip"
               variant="success"
@@ -374,7 +370,7 @@ export default function WorkPackage() {
             </Button>
           )}
         </div>
-        {data.length > 0 ? (
+        {data && data.length > 0 ? (
           <Table
             tableData={data}
             HandleRowUpdate={(value) => updateRowInStore(value)}

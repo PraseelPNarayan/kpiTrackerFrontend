@@ -85,9 +85,9 @@ const Login = () => {
               id: response.data.loggedIn.id,
               office: response.data.loggedIn.office
             };
-            setToken(JSON.stringify(loginStaffPayload));
             dispatch(loginStaff(loginStaffPayload));
-            // navigate("/home/importdata", { replace: true });
+            setToken(JSON.stringify(loginStaffPayload));
+            //navigate("/home/importdata", { replace: true });
        
           }
         })

@@ -146,12 +146,14 @@ export const kpiTrackerSlice = createSlice({
       if(filterValue){state.filters[filterName]=filterValue}
       else {delete state.filters[filterName]}
 
-            state.filteredWorkpackage = state.workPackage.filter((wp) => {
+        state.filteredWorkpackage =  state.workPackage.filter((wp) => {
        return Object.keys(state.filters).every((filter)=>{
      
         if(filter ==='wp')
         {
-          return wp.wp.toLowerCase() === state.filters[filter].toLowerCase();
+          console.log('wp', wp.wp, filterValue);
+          
+          return wp.wp.toLowerCase() === filterValue.toLowerCase();
         }
         if(filter ==='operator')
           {
@@ -234,7 +236,8 @@ export const kpiTrackerSlice = createSlice({
         state.success = false;
       })
       .addCase(Api.putHeadersOnBatch.pending, (state) => {
-        state.success = "pending";
+        state.success = false;
+        state.toggleSpinner = true;
         state.error = false;
         state.errorMessage = null;
       })
@@ -250,13 +253,16 @@ export const kpiTrackerSlice = createSlice({
         state.success = true;
       })
       .addCase(Api.putHeadersOnBatch.rejected, (state, action) => {
+       
         state.status = "failed";
         state.errorMessage = action.error.message;
         state.success = false;
+        state.toggleSpinner = false;
         state.error = true;
       })
       .addCase(Api.putHeadersOnBatchEntries.pending, (state) => {
         state.success = false;
+        state.toggleSpinner = true;
         state.error = false;
         state.errorMessage = null;
       })
@@ -269,6 +275,7 @@ export const kpiTrackerSlice = createSlice({
         });
 
         state.success = true;
+        state.toggleSpinner = false;
       })
       .addCase(Api.putHeadersOnBatchEntries.rejected, (state, action) => {
         state.status = "failed";
