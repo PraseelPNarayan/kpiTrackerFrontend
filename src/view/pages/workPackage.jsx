@@ -14,6 +14,7 @@ import {
   faFilter,
   faMagnifyingGlass,
   faPenToSquare,
+  faFileExport
 } from "@fortawesome/free-solid-svg-icons";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -33,6 +34,7 @@ import { makeStyles } from "@mui/styles";
 import Table from "../common/table";
 import ApiService from "../../js/api/apiService";
 import moment from "moment";
+import exportCSV from "../common/exportCsv";
 
 import Success from "../common/success";
 import Errors from "../common/errors";
@@ -369,6 +371,16 @@ export default function WorkPackage() {
               />
             </Button>
           )}
+         {data &&  <Button
+                    data-tooltip-id="my-tooltip"
+                    variant="success"
+                    className="m-2"
+                    onClick={() => exportCSV(data)}
+                    data-tooltip-content="Export All Data"
+            
+                  >
+                    <FontAwesomeIcon icon={faFileExport} />
+                  </Button>}
         </div>
         {data && data.length > 0 ? (
           <Table
