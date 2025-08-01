@@ -49,7 +49,7 @@ const initialState = {
   OldFilterOperatorText: "",
   OldFilterInspDate: "",
   filters: {},
-  notUploaded : []
+  notUploaded: [],
 };
 
 export const kpiTrackerSlice = createSlice({
@@ -92,7 +92,8 @@ export const kpiTrackerSlice = createSlice({
       state.missingWorkPackages = null;
     },
     updateNotUploaded: (state, action) => {
-      state.notUploaded = action.payload;},
+      state.notUploaded = action.payload;
+    },
     updateWorkPackageRow: (state, action) => {
       let creatWorkPackageCopy = [...state.workPackage];
       creatWorkPackageCopy[action.payload.id] = action.payload;
@@ -103,7 +104,7 @@ export const kpiTrackerSlice = createSlice({
       createHeadersOnCopy[action.payload.id] = action.payload;
       state.headersOn = createHeadersOnCopy;
     },
-  
+
     updateCoder: (state, action) => {
       state.coderToUpdate = action.payload;
     },
@@ -136,41 +137,41 @@ export const kpiTrackerSlice = createSlice({
       state.filterOperatorText = action.payload;
     },
     setFilterInspDate: (state, action) => {
-
       state.filterInspDate = action.payload;
     },
     setFilteredWP: (state, action) => {
-      const {filterName, filterValue} = action.payload
-     
+      const { filterName, filterValue } = action.payload;
 
-      if(filterValue){state.filters[filterName]=filterValue}
-      else {delete state.filters[filterName]}
+      if (filterValue) {
+        state.filters[filterName] = filterValue;
+      } else {
+        delete state.filters[filterName];
+      }
 
-        state.filteredWorkpackage =  state.workPackage.filter((wp) => {
-       return Object.keys(state.filters).every((filter)=>{
-     
-        if(filter ==='wp')
-        {
-          console.log('wp', wp.wp, filterValue);
-          
-          return wp.wp.toLowerCase() === filterValue.toLowerCase();
-        }
-        if(filter ==='operator')
-          {
-            return wp.operator !== null && wp.operator.toLowerCase().match(state.filters[filter].toLowerCase());
+      state.filteredWorkpackage = state.workPackage.filter((wp) => {
+        return Object.keys(state.filters).every((filter) => {
+          if (filter === "wp") {
+            return wp.wp.toLowerCase() === filterValue.toLowerCase();
           }
-        if(filter ==='inspDate')
-          {
-            return wp.inspection_Date !== null && wp.inspection_Date === state.filters[filter];
+          if (filter === "operator") {
+            return (
+              wp.operator !== null &&
+              wp.operator
+                .toLowerCase()
+                .match(state.filters[filter].toLowerCase())
+            );
           }
-       })
-      
+          if (filter === "inspDate") {
+            return (
+              wp.inspection_Date !== null &&
+              wp.inspection_Date === state.filters[filter]
+            );
+          }
+        });
       });
-
     },
     deleteDate: (state, action) => {
       delete state.filterInspDate;
-  
     },
   },
   extraReducers: (builder) => {
@@ -187,12 +188,11 @@ export const kpiTrackerSlice = createSlice({
         // copyCurrentState.push(action.payload);
         // state.headersOn = action.payload;
         state.missingWorkPackages = action.payload;
-    
+
         state.toggleSpinner = false;
         state.success = true;
       })
       .addCase(Api.postCreateHeadersOn.rejected, (state, action) => {
-     
         state.status = "failed";
         state.errorMessage = action.error.message;
         state.toggleSpinner = false;
@@ -243,17 +243,11 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putHeadersOnBatch.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // action.payload.forEach(headersOn => {
-        //   let index = state.headersOn.findIndex(x => x.id === headersOn.id)
-
-        //   state.headersOn[index] = headersOn;
-
-        // })
         state.missingWorkPackages = action.payload;
         state.success = true;
+        state.toggleSpinner = false;
       })
       .addCase(Api.putHeadersOnBatch.rejected, (state, action) => {
-       
         state.status = "failed";
         state.errorMessage = action.error.message;
         state.success = false;
@@ -442,13 +436,11 @@ export const kpiTrackerSlice = createSlice({
       })
       .addCase(Api.putWorkpackagesBatch.fulfilled, (state, action) => {
         state.status = "succeeded";
-        action.payload.forEach(wp => {
-          let index = state.workPackage.findIndex(x => x.id === wp.id)
-       
+        action.payload.forEach((wp) => {
+          let index = state.workPackage.findIndex((x) => x.id === wp.id);
 
           state.workPackage[index] = wp;
-
-        })
+        });
         // state.missingWorkPackages = action.payload;
         state.success = true;
       })
@@ -547,7 +539,7 @@ export const {
   setFilterOperatorText,
   setFilterInspDate,
   deleteDate,
-  updateNotUploaded
+  updateNotUploaded,
 } = kpiTrackerSlice.actions;
 
 export default kpiTrackerSlice.reducer;

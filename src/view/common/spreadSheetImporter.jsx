@@ -1,6 +1,7 @@
 import moment from "moment";
 import React from "react";
-import { ReactSpreadsheetImport, StepType } from "react-spreadsheet-import";
+import { ReactSpreadsheetImport } from "react-spreadsheet-import";
+
 
 // import XLSX from "xlsx";
 
@@ -12,13 +13,13 @@ export default function SpreadSheetImporter({
 }) {
   return (
     <React.Fragment>
+        
       <ReactSpreadsheetImport
         isOpen={isImportOpen}
         onClose={() => CloseImporter(true)}
         onSubmit={(data) => {
           let addedData = [];
           data.validData.forEach((element, index) => {
-            console.log(parseFloat(element.GIS_Length), element.GIS_Length);
             let newData = { status: "", id: 0, ...element };
             newData.Date_of_Inspection = newData.Date_of_Inspection
               ? moment(newData.Date_of_Inspection, "DD/MM/YYYY").format(
