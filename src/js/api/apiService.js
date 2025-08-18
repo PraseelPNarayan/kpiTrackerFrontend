@@ -186,7 +186,7 @@ const initialWorkPackageFields = [
   {
     label: "Urgent",
 
-    key: "Urgent",
+    key: "urgent",
 
     fieldType: {
       type: "select",
@@ -309,7 +309,7 @@ const workPackageFields = [
   {
     label: "Urgent",
 
-    key: "Urgent",
+    key: "urgent",
 
     fieldType: {
       type: "select",
@@ -740,7 +740,7 @@ const dailyReportFields = [
   {
     label: "Urgent",
 
-    key: "Urgent",
+    key: "urgent",
 
     fieldType: {
       type: "select",
@@ -1129,7 +1129,7 @@ const headersOnFields = [
   {
     label: "Urgent",
 
-    key: "Urgent",
+    key: "urgent",
 
     fieldType: {
       type: "select",
